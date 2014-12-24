@@ -10,6 +10,7 @@
 		B825FA161A4985C000FC4C0E /* JSJSON.h in Headers */ = {isa = PBXBuildFile; fileRef = B825FA151A4985C000FC4C0E /* JSJSON.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B825FA1C1A4985C000FC4C0E /* JSJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B825FA101A4985C000FC4C0E /* JSJSON.framework */; };
 		B825FA231A4985C000FC4C0E /* JSJSONTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B825FA221A4985C000FC4C0E /* JSJSONTests.swift */; };
+		B825FA2D1A4985FB00FC4C0E /* JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = B825FA2C1A4985FB00FC4C0E /* JSON.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,6 +30,7 @@
 		B825FA1B1A4985C000FC4C0E /* JSJSONTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JSJSONTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B825FA211A4985C000FC4C0E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B825FA221A4985C000FC4C0E /* JSJSONTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSJSONTests.swift; sourceTree = "<group>"; };
+		B825FA2C1A4985FB00FC4C0E /* JSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSON.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +74,7 @@
 			isa = PBXGroup;
 			children = (
 				B825FA151A4985C000FC4C0E /* JSJSON.h */,
+				B825FA2C1A4985FB00FC4C0E /* JSON.swift */,
 				B825FA131A4985C000FC4C0E /* Supporting Files */,
 			);
 			path = JSJSON;
@@ -209,6 +212,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B825FA2D1A4985FB00FC4C0E /* JSON.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -319,6 +323,7 @@
 		B825FA271A4985C000FC4C0E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -328,12 +333,14 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		B825FA281A4985C000FC4C0E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
