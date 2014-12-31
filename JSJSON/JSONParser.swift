@@ -6,6 +6,8 @@
 //  Copyright (c) 2014 Jernej Strasner. All rights reserved.
 //
 
+import Foundation
+
 struct Stack<T> : DebugPrintable {
     private var storage = [T]()
 
@@ -36,10 +38,10 @@ struct Stack<T> : DebugPrintable {
     }
 }
 
-class JObject : JSONValue, DebugPrintable {
+public class JObject : JSONValue, DebugPrintable {
     private var storage = [String : JSONValue]()
 
-    subscript(key: String) -> JSONValue! {
+    public subscript(key: String) -> JSONValue! {
         get {
             return storage[key]
         }
@@ -48,15 +50,15 @@ class JObject : JSONValue, DebugPrintable {
         }
     }
 
-    var debugDescription: String {
+    public var debugDescription: String {
         return storage.debugDescription
     }
 }
 
-class JArray : JSONValue, DebugPrintable {
+public class JArray : JSONValue, DebugPrintable {
     private var storage = [JSONValue]()
 
-    subscript(index: Int) -> JSONValue! {
+    public subscript(index: Int) -> JSONValue! {
         if index < storage.count && index >= 0 {
             return storage[index]
         }
@@ -67,7 +69,7 @@ class JArray : JSONValue, DebugPrintable {
         storage.append(value)
     }
 
-    var debugDescription: String {
+    public var debugDescription: String {
         return storage.debugDescription
     }
 }
@@ -88,15 +90,75 @@ extension Float : JSONValue {}
 extension Double : JSONValue {}
 extension String : JSONValue {}
 
+public enum TokenValue {
+    case Null
+    case N(Double)
+    case S(String)
+    case B(Bool)
+    case A([TokenValue])
+    case O([String:TokenValue])
+
+//    init(_ value: JSONValue?) {
+//        switch value {
+//        case .None: self = .Null
+//        case .Some(let s as String): self = .S(s)
+//        case .Some(let b as Bool): self = .B(b)
+//        }
+//    }
+
+    var isNull: Bool {
+        switch self {
+        case .Null: return true
+        default: return false
+        }
+    }
+
+    var string: String? {
+        switch self {
+        case .S(let s): return s
+        default: return nil
+        }
+    }
+
+    var number: Double? {
+        switch self {
+        case .N(let d): return d
+        default: return nil
+        }
+    }
+
+    var bool: Bool? {
+        switch self {
+        case .B(let b): return b
+        default: return nil
+        }
+    }
+
+    subscript(index: Int) -> TokenValue? {
+        switch self {
+        case .A(let a) where a.count > index: return a[index]
+        default: return nil
+        }
+    }
+
+    subscript(key: String) -> TokenValue? {
+        switch self {
+        case .O(let o): return o[key]
+        default: return nil
+        }
+    }
+}
+
 public class JSONParser {
 
-    let json: String
-    var tokens = Stack<JSONValue>()
-    var position: String.Index
+    let json: String.UnicodeScalarView
+    var tokens: Stack<JSONValue>
+    var position: String.UnicodeScalarView.Index
 
     init(_ s: String) {
-        json = s
-        position = s.startIndex
+        json = s.unicodeScalars
+        position = json.startIndex
+        tokens = Stack<JSONValue>()
     }
 
     public func parse() -> JSONValue? {
@@ -148,8 +210,9 @@ public class JSONParser {
                     case "f":
                         value = false
                     default:
-                        if let i = primitive.toInt() {
-                            value = Double(i)
+                        let nf = NSNumberFormatter()
+                        if let i = nf.numberFromString(String(primitive)) {
+                            value = Double(i.doubleValue)
                         }
                     }
                     if let v = value {
@@ -186,7 +249,7 @@ public class JSONParser {
         }
     }
 
-    let hexCharacters = "0123456789abcdefABCDEF"
+    let hexCharacters: [UnicodeScalar] = ["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f","A","B","C","D","E","F"]
 
     private func parseString() -> String? {
         // Skip the opening "
@@ -197,7 +260,7 @@ public class JSONParser {
             let c = json[position]
             // Check for end of string
             if c == "\"" {
-                return json[start..<position]
+                return String(json[start..<position])
             }
 
             // Check for escaped symbols
@@ -224,18 +287,18 @@ public class JSONParser {
         return nil
     }
 
-    private func parsePrimitive() -> String? {
+    private func parsePrimitive() -> String.UnicodeScalarView? {
         let start = position
         for ; position < json.endIndex; position++ {
             let c = json[position]
             if isTerminator(c) {
-                return json[start..<position]
+                return json[start..<position--]
             }
         }
         return nil
     }
 
-    private func isTerminator(char: Character) -> Bool {
+    private func isTerminator(char: UnicodeScalar) -> Bool {
         switch char {
         case "\t", "\n", "\r", " ", ",", "]", "}": return true
         default: return false
@@ -250,8 +313,8 @@ private func *(left: Character, right: Int) -> String {
 }
 
 private func logIndented<T>(x: Int, s: T) {
-    let tabs = "\t" * x
-    println("\(tabs)\(s)")
+//    let tabs = ">" * x
+//    println("\(tabs)\(s)")
 }
 
 private func noop() {}
