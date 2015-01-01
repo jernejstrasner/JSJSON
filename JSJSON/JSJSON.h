@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Jernej Strasner. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
 //! Project version number for JSJSON.
 FOUNDATION_EXPORT double JSJSONVersionNumber;

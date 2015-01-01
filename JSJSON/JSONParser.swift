@@ -12,16 +12,16 @@ struct Stack<T> : DebugPrintable {
     private var storage = [T]()
 
     mutating func push(el: T) {
-        logIndented(self.size, "PUSH \(_stdlib_getDemangledTypeName(el)): \(el)")
+//        logIndented(self.size, "PUSH \(_stdlib_getDemangledTypeName(el)): \(el)")
         storage.append(el)
     }
 
     mutating func pop() -> T! {
         if storage.count > 0 {
-            logIndented(self.size-1, "POP \(_stdlib_getDemangledTypeName(storage.last!))")
+//            logIndented(self.size-1, "POP \(_stdlib_getDemangledTypeName(storage.last!))")
             return storage.removeLast()
         }
-        logIndented(0, "POP EMPTY")
+//        logIndented(0, "POP EMPTY")
         return nil
     }
 
@@ -313,8 +313,8 @@ private func *(left: Character, right: Int) -> String {
 }
 
 private func logIndented<T>(x: Int, s: T) {
-//    let tabs = ">" * x
-//    println("\(tabs)\(s)")
+    let tabs = ">" * x
+    println("\(tabs)\(s)")
 }
 
 private func noop() {}
