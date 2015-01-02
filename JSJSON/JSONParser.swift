@@ -8,33 +8,42 @@
 
 import Foundation
 
-struct Stack<T> : DebugPrintable {
-    private var storage = [T]()
+private class StackNode<T> {
+    let value: T
+    var previous: StackNode?
+
+    init(_ v: T) {
+        value = v
+    }
+}
+
+private struct Stack<T> {
+    private var tail: StackNode<T>!
+
+    init() {}
 
     mutating func push(el: T) {
 //        logIndented(self.size, "PUSH \(_stdlib_getDemangledTypeName(el)): \(el)")
-        storage.append(el)
+        if tail == nil {
+            tail = StackNode(el)
+        } else {
+            let prev = tail
+            tail = StackNode(el)
+            tail.previous = prev
+        }
     }
 
     mutating func pop() -> T! {
-        if storage.count > 0 {
-//            logIndented(self.size-1, "POP \(_stdlib_getDemangledTypeName(storage.last!))")
-            return storage.removeLast()
+        var el = tail
+        if el != nil {
+//          logIndented(self.size-1, "POP \(_stdlib_getDemangledTypeName(storage.last!))")
+            tail = el.previous
         }
-//        logIndented(0, "POP EMPTY")
-        return nil
+        return el?.value
     }
 
     func peek() -> T! {
-        return storage.last
-    }
-
-    var size: Int {
-        return storage.count
-    }
-
-    var debugDescription: String {
-        return storage.debugDescription
+        return tail?.value
     }
 }
 
@@ -319,5 +328,3 @@ private func logIndented<T>(x: Int, s: T) {
     let tabs = ">" * x
     println("\(tabs)\(s)")
 }
-
-private func noop() {}
