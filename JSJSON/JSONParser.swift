@@ -160,12 +160,13 @@ public enum TokenValue {
 
 public class JSONParser {
 
-    let json: ContiguousArray<UInt8>
+    let json: Slice<UInt8>
     private var tokens: Stack<JSONValue>
     private var position: Int
 
     init(_ s: String) {
-        json = s.nulTerminatedUTF8
+        let nn = s.nulTerminatedUTF8
+        json = nn[nn.startIndex..<nn.endIndex]
         position = json.startIndex
         tokens = Stack<JSONValue>()
     }
