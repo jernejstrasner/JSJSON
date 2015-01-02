@@ -51,6 +51,13 @@ class JSONParserTests: XCTestCase {
         }
     }
 
+    func testInitSpeed() {
+        let jsonString = loadJSON("crazy")
+        measureBlock {
+            let parser = JSONParser(jsonString!)
+        }
+    }
+
     func testOurSpeed() {
         let jsonString = loadJSON("movies")
         measureMetrics([XCTPerformanceMetric_WallClockTime], automaticallyStartMeasuring: false) {

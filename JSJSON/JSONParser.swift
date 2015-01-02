@@ -160,19 +160,21 @@ public enum TokenValue {
 
 public class JSONParser {
 
-    let json: Slice<UInt8>
+    let json: UnsafePointer<UInt8>
     private var tokens: Stack<JSONValue>
     private var position: Int
+    private let length: Int
 
     init(_ s: String) {
-        let nn = s.nulTerminatedUTF8
-        json = nn[nn.startIndex..<nn.endIndex]
-        position = json.startIndex
+        let nsstring = s as NSString
+        json = UnsafePointer<UInt8>(nsstring.UTF8String)
+        length = nsstring.lengthOfBytesUsingEncoding(NSUTF8StringEncoding)
+        position = 0
         tokens = Stack<JSONValue>()
     }
 
     public func parse() -> JSONValue? {
-        for ; position < json.endIndex; position++ {
+        for ; position < length; position++ {
             let c = json[position]
             switch c {
             case 0x7b: // {
@@ -258,20 +260,20 @@ public class JSONParser {
         }
     }
 
-    private func parseString() -> Slice<UInt8>? {
+    private func parseString() -> (UnsafePointer<UInt8>, Int)? {
         // Skip the opening "
         position++
         let start = position
 
-        for ; position < json.endIndex; position++ {
+        for ; position < length; position++ {
             let c = json[position]
             // Check for end of string
             if c == 0x22 {
-                return json[start..<position]
+                return (json.advancedBy(start), position-start)
             }
 
             // Check for escaped symbols
-            if c == 0x5c && position+1 < json.endIndex {
+            if c == 0x5c && position+1 < length {
                 // Advance by one so we can switch on the symbol
                 let c = json[++position]
                 switch c {
@@ -280,7 +282,7 @@ public class JSONParser {
                 case 0x75:
                     // Check for valid hex characters
                     position++
-                    for var i = 0; i < 4 && position < json.endIndex; i++, position++ {
+                    for var i = 0; i < 4 && position < length; i++, position++ {
                         switch json[position] {
                         case 0x30...0x39, 0x41...0x46, 0x61...0x66: continue
                         default: assertionFailure("Invalid HEX character: \(json[position])")
@@ -295,19 +297,19 @@ public class JSONParser {
         return nil
     }
 
-    private func parsePrimitive() -> Slice<UInt8>? {
+    private func parsePrimitive() -> (UnsafePointer<UInt8>, Int)? {
         let start = position
-        for ; position < json.endIndex; position++ {
+        for ; position < length; position++ {
             switch json[position] {
             case 0x9, 0x0d, 0x0a, 0x20, 0x2c, 0x7d, 0x5d:
-                return json[start..<position--]
+                return (json.advancedBy(start), (position--)-start)
             default: continue
             }
         }
         return nil
     }
 
-    private func convertToString(a: Slice<UInt8>?) -> String! {
+    private func convertToString(a: (UnsafePointer<UInt8>, Int)?) -> String! {
         if a != nil {
 //            return a!.withUnsafeBufferPointer {
 //                String.fromCString(UnsafeMutablePointer($0.baseAddress))
