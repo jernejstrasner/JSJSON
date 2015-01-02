@@ -151,12 +151,12 @@ public enum TokenValue {
 
 public class JSONParser {
 
-    let json: String.UnicodeScalarView
-    var tokens: Stack<JSONValue>
-    var position: String.UnicodeScalarView.Index
+    let json: ContiguousArray<UInt8>
+    private var tokens: Stack<JSONValue>
+    private var position: Int
 
     init(_ s: String) {
-        json = s.unicodeScalars
+        json = s.nulTerminatedUTF8
         position = json.startIndex
         tokens = Stack<JSONValue>()
     }
@@ -165,15 +165,14 @@ public class JSONParser {
         for ; position < json.endIndex; position++ {
             let c = json[position]
             switch c {
-            case "{":
+            case 0x7b: // {
                 tokens.push(JObject())
-            case "[":
+            case 0x5b: // [
                 tokens.push(JArray())
-            case "]", "}":
+            case 0x7d, 0x5d: // }, ]
                 switch c {
-                case "}": assert(tokens.peek() is JObject, "Unmatched Object closing bracket!")
-                case "]": assert(tokens.peek() is JArray, "Unmatched Array closing bracket!")
-                default: break
+                case 0x7d: assert(tokens.peek() is JObject, "Unmatched Object closing bracket!")
+                default: assert(tokens.peek() is JArray, "Unmatched Array closing bracket!")
                 }
                 let lastToken = tokens.pop()
                 let parentToken = tokens.peek()
@@ -183,36 +182,36 @@ public class JSONParser {
                 }
                 // If not insert the token into the stack or parent token
                 insertIntoStack(lastToken)
-            case "\t", "\r", "\n", " ":
+            case 0x9, 0x0d, 0x0a, 0x20: // \t, \r, \n, (space)
                 // Blank space
                 break
-            case "\"":
+            case 0x22: // "
                 // String
                 if let token = parseString() {
-                    insertIntoStack(token)
+                    if let tok = convertToString(token) {
+                        insertIntoStack(tok)
+                    } else {
+                        assertionFailure("Could not parse string!")
+                    }
                 } else {
                     assertionFailure("Could not parse string!")
                 }
-            case ":":
+            case 0x3a: // :
                 break
-            case ",":
+            case 0x2c: // ,
                 // Next object in array
                 break
-            case "-", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "t", "f", "n":
+            case 0x2d, 0x30...0x39, 0x74, 0x66, 0x6e: // -, 0-9, t, f, n
                 // Number
                 if let primitive = parsePrimitive() {
                     var value: JSONValue?
                     switch c {
-                    case "n":
-                        value = "null"
-                    case "t":
-                        value = true
-                    case "f":
-                        value = false
+                    case 0x6e:  value = "null"
+                    case 0x74:  value = true
+                    case 0x66:  value = false
                     default:
-                        let nf = NSNumberFormatter()
-                        if let i = nf.numberFromString(String(primitive)) {
-                            value = Double(i.doubleValue)
+                        if let s = convertToString(primitive) {
+                            value = NSNumberFormatter().numberFromString(s)?.doubleValue
                         }
                     }
                     if let v = value {
@@ -249,9 +248,7 @@ public class JSONParser {
         }
     }
 
-    let hexCharacters: [UnicodeScalar] = ["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f","A","B","C","D","E","F"]
-
-    private func parseString() -> String? {
+    private func parseString() -> Slice<UInt8>? {
         // Skip the opening "
         position++
         let start = position
@@ -259,23 +256,24 @@ public class JSONParser {
         for ; position < json.endIndex; position++ {
             let c = json[position]
             // Check for end of string
-            if c == "\"" {
-                return String(json[start..<position])
+            if c == 0x22 {
+                return json[start..<position]
             }
 
             // Check for escaped symbols
-            if c == "\\" && position.successor() < json.endIndex {
+            if c == 0x5c && position+1 < json.endIndex {
                 // Advance by one so we can switch on the symbol
                 let c = json[++position]
                 switch c {
-                case "\"", "/", "\\", "b", "f", "r", "n", "t":
+                case 0x22, 0x2f, 0x5c, 0x62, 0x66, 0x72, 0x6e, 0x74:
                     break;
-                case "u":
+                case 0x75:
                     // Check for valid hex characters
                     position++
                     for var i = 0; i < 4 && position < json.endIndex; i++, position++ {
-                        if !contains(hexCharacters, json[position]) {
-                            assertionFailure("Invalid HEX character: \(json[position])")
+                        switch json[position] {
+                        case 0x30...0x39, 0x41...0x46, 0x61...0x66: continue
+                        default: assertionFailure("Invalid HEX character: \(json[position])")
                         }
                     }
                     position--
@@ -287,22 +285,27 @@ public class JSONParser {
         return nil
     }
 
-    private func parsePrimitive() -> String.UnicodeScalarView? {
+    private func parsePrimitive() -> Slice<UInt8>? {
         let start = position
         for ; position < json.endIndex; position++ {
-            let c = json[position]
-            if isTerminator(c) {
+            switch json[position] {
+            case 0x9, 0x0d, 0x0a, 0x20, 0x2c, 0x7d, 0x5d:
                 return json[start..<position--]
+            default: continue
             }
         }
         return nil
     }
 
-    private func isTerminator(char: UnicodeScalar) -> Bool {
-        switch char {
-        case "\t", "\n", "\r", " ", ",", "]", "}": return true
-        default: return false
+    private func convertToString(a: Slice<UInt8>?) -> String! {
+        if a != nil {
+//            return a!.withUnsafeBufferPointer {
+//                String.fromCString(UnsafeMutablePointer($0.baseAddress))
+//            }!
+//            return a!.reduce(""){"\($0)\(String(UnicodeScalar($1)))"}
+            return "122"
         }
+        return nil
     }
 }
 
