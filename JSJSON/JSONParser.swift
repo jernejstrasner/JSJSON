@@ -313,11 +313,7 @@ public class JSONParser {
 
     private func convertToString(a: (UnsafePointer<Int8>, Int)?) -> String! {
         if a != nil {
-//            return a!.withUnsafeBufferPointer {
-//                String.fromCString(UnsafeMutablePointer($0.baseAddress))
-//            }!
-//            return a!.reduce(""){"\($0)\(String(UnicodeScalar($1)))"}
-            return "122"
+            return NSString(bytes: a!.0, length: a!.1, encoding: NSUTF8StringEncoding)
         }
         return nil
     }
