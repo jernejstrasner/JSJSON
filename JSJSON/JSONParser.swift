@@ -160,14 +160,16 @@ public enum TokenValue {
 
 public class JSONParser {
 
-    let json: UnsafePointer<UInt8>
-    private var tokens: Stack<JSONValue>
-    private var position: Int
+    let jsonString: String
+    private let json: UnsafePointer<Int8>
     private let length: Int
+    private var position: Int
+    private var tokens: Stack<JSONValue>
 
     init(_ s: String) {
+        jsonString = s
         let nsstring = s as NSString
-        json = UnsafePointer<UInt8>(nsstring.UTF8String)
+        json = nsstring.UTF8String
         length = nsstring.lengthOfBytesUsingEncoding(NSUTF8StringEncoding)
         position = 0
         tokens = Stack<JSONValue>()
@@ -260,7 +262,7 @@ public class JSONParser {
         }
     }
 
-    private func parseString() -> (UnsafePointer<UInt8>, Int)? {
+    private func parseString() -> (UnsafePointer<Int8>, Int)? {
         // Skip the opening "
         position++
         let start = position
@@ -297,7 +299,7 @@ public class JSONParser {
         return nil
     }
 
-    private func parsePrimitive() -> (UnsafePointer<UInt8>, Int)? {
+    private func parsePrimitive() -> (UnsafePointer<Int8>, Int)? {
         let start = position
         for ; position < length; position++ {
             switch json[position] {
@@ -309,7 +311,7 @@ public class JSONParser {
         return nil
     }
 
-    private func convertToString(a: (UnsafePointer<UInt8>, Int)?) -> String! {
+    private func convertToString(a: (UnsafePointer<Int8>, Int)?) -> String! {
         if a != nil {
 //            return a!.withUnsafeBufferPointer {
 //                String.fromCString(UnsafeMutablePointer($0.baseAddress))
