@@ -160,19 +160,32 @@ public enum TokenValue {
 
 public class JSONParser {
 
-    let jsonString: String
     private let json: UnsafePointer<Int8>
     private let length: Int
-    private var position: Int
-    private var tokens: Stack<JSONValue>
+    private var position = 0
+    private var tokens = Stack<JSONValue>()
 
-    init(_ s: String) {
-        jsonString = s
-        let nsstring = s as NSString
-        json = nsstring.UTF8String
-        length = nsstring.lengthOfBytesUsingEncoding(NSUTF8StringEncoding)
-        position = 0
-        tokens = Stack<JSONValue>()
+    convenience init?(_ s: String) {
+        if let data = s.dataUsingEncoding(NSUTF8StringEncoding) {
+            self.init(bytes: UnsafePointer<Int8>(data.bytes), length: data.length)
+        } else {
+            self.init()
+            return nil
+        }
+    }
+
+    convenience init(_ data: NSData) {
+        self.init(bytes: UnsafePointer<Int8>(data.bytes), length: data.length)
+    }
+
+    init(bytes: UnsafePointer<Int8>, length: Int) {
+        self.json = bytes
+        self.length = length
+    }
+
+    init() {
+        json = UnsafePointer<Int8>(nil)
+        length = 0
     }
 
     public func parse() -> JSONValue? {
@@ -223,10 +236,7 @@ public class JSONParser {
                     case 0x6e:  value = "null"
                     case 0x74:  value = true
                     case 0x66:  value = false
-                    default:
-                        if let s = convertToString(primitive) {
-                            value = NSNumberFormatter().numberFromString(s)?.doubleValue
-                        }
+                    default:    value = convertToNumber(primitive)
                     }
                     if let v = value {
                         insertIntoStack(v)
@@ -271,7 +281,7 @@ public class JSONParser {
             let c = json[position]
             // Check for end of string
             if c == 0x22 {
-                return (json.advancedBy(start), position-start)
+                return (json+start, position-start)
             }
 
             // Check for escaped symbols
@@ -304,19 +314,64 @@ public class JSONParser {
         for ; position < length; position++ {
             switch json[position] {
             case 0x9, 0x0d, 0x0a, 0x20, 0x2c, 0x7d, 0x5d:
-                return (json.advancedBy(start), (position--)-start)
+                return (json+start, (position--)-start)
             default: continue
             }
         }
         return nil
     }
 
-    private func convertToString(a: (UnsafePointer<Int8>, Int)?) -> String! {
+    private func convertToString(a: (UnsafePointer<Int8>, Int)?) -> String? {
         if a != nil {
             return NSString(bytes: a!.0, length: a!.1, encoding: NSUTF8StringEncoding)
         }
         return nil
     }
+
+    func convertToNumber(a: (UnsafePointer<Int8>, Int)?) -> Double? {
+        if let (s, l) = a {
+//            var ss = ""
+//            for var i = 0; i < l; i++ {
+//                ss.append(UnicodeScalar(numericCast(s[i]) as UInt8))
+//            }
+//            print("\(l) \(s) -> \(ss)")
+
+            var isFloatingPoint = false
+            var isNegative = false
+
+            // Check if we have a valid number and determine if it's a float and/or negative
+            for var i = 0; i < l; i++ {
+                switch s[i] {
+                case 0x2d where i == 0 || isFloatingPoint:
+                    isNegative = true
+                case 0x2e, 0x45, 0x65 where i > 0:
+                    isFloatingPoint = true
+                case 0x2b where i > 0:
+                    continue
+                case 0x30...0x39:
+                    continue
+                default:
+                    fatalError("Invalid number!")
+                }
+            }
+
+            // Parse the number
+            var number: Double
+            if isFloatingPoint {
+                number = strtod(s, nil)
+            } else {
+                if isNegative {
+                    number = Double(strtoll(s, nil, 10))
+                } else {
+                    number = Double(strtoull(s, nil, 10))
+                }
+            }
+//            println(" = \(number)")
+            return number
+        }
+        return nil
+    }
+
 }
 
 // MARK: Debugging Utilities

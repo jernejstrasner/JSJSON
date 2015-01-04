@@ -3,7 +3,9 @@
         "actors": "Nathan Simony, Beno\u00eet Allemane, Vincent Grass, Jean-Claude Donda, Pascal Sellem, Alexis Tomassian",
         "country": "Francija",
         "director": "Luc Vinciguerra",
-        "duration": 82,
+        "duration": 82.33,
+        "some_number": 1.5E-2,
+        "num": 1.5,
         "genre": "animirana dru\u017einska pustolov\u0161\u010dina",
         "imdb": null,
         "language": "franco\u0161\u010dina",
@@ -60,7 +62,7 @@
         "title": "L'apprenti Pere Noel et le flocon magique",
         "trailer": "http://trailer.cineplexx.si/media/si/inc/movies_licences/Bo_i_kov_vajenec_in__arobna_sne_inka_(2014).mp4",
         "writer": "David Freedman, Alexandre Reverend in Luc Vinciguerra",
-        "year": 2013
+        "year": 2013E-4
     },
     {
         "actors": "Jim Carrey,  Jeff Daniels,  Kathleen Turner",

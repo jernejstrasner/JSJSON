@@ -19,7 +19,7 @@ class JSONParserTests: XCTestCase {
         XCTAssert(jsonObj != nil)
         XCTAssert(error == nil)
 
-        let json = JSONParser(jsonString!).parse()
+        let json = JSONParser(jsonString!)!.parse()
         XCTAssert(json != nil)
 
         // Check integrity
@@ -39,7 +39,7 @@ class JSONParserTests: XCTestCase {
         XCTAssert(error != nil)
 
         // We can!
-        let json = JSONParser(jsonString!).parse()
+        let json = JSONParser(jsonString!)!.parse()
         XCTAssert(json != nil)
     }
 
@@ -51,41 +51,36 @@ class JSONParserTests: XCTestCase {
         }
     }
 
-    func testInitSpeed() {
-        let jsonString = loadJSON("crazy")
-        measureBlock {
-            let parser = JSONParser(jsonString!)
-        }
-    }
-
-    func testParsingSpeed() {
-        let jsonString = loadJSON("movies")
-        measureMetrics([XCTPerformanceMetric_WallClockTime], automaticallyStartMeasuring: false) {
-            let parser = JSONParser(jsonString!)
-            self.startMeasuring()
-            let json = parser.parse()
-            self.stopMeasuring()
-        }
-    }
-
-    func testCompleteSpeed() {
+    func testSpeed() {
         let jsonString = loadJSON("movies")
         measureBlock {
-            let json = JSONParser(jsonString!).parse()
+            let json = JSONParser(jsonString!)!.parse()
         }
     }
 
-    func testCompleteSpeedCrazy() {
+    func testSpeedCrazy() {
         let jsonString = loadJSON("crazy")
         measureBlock {
-            let json = JSONParser(jsonString!).parse()
+            let json = JSONParser(jsonString!)!.parse()
         }
+    }
+
+    func testNumberConversion() {
+        XCTAssert(toNumber("399") == 399)
+        XCTAssert(toNumber("1.53") == 1.53)
+        XCTAssert(toNumber("-0.344") == -0.344)
+        XCTAssert(toNumber("1.3e4") == 1.3e4)
     }
 
     func loadJSON(fileName: String) -> String! {
         let bundle = NSBundle(forClass: self.dynamicType)
         let url = bundle.URLForResource(fileName, withExtension: "json")
         return String(contentsOfURL: url!, encoding: NSUTF8StringEncoding, error: nil)
+    }
+
+    func toNumber(s: String) -> Double! {
+        let a = ((s as NSString).UTF8String, (s as NSString).lengthOfBytesUsingEncoding(NSUTF8StringEncoding))
+        return JSONParser(s)!.convertToNumber(a)
     }
 
 }
