@@ -15,7 +15,13 @@ class JSONParserTests: XCTestCase {
         XCTAssert(jsonString != nil)
 
         var error: NSError?
-        let jsonObj: AnyObject? = NSJSONSerialization.JSONObjectWithData(jsonString.dataUsingEncoding(NSUTF8StringEncoding)!, options: nil, error: &error)
+        let jsonObj: AnyObject?
+        do {
+            jsonObj = try NSJSONSerialization.JSONObjectWithData(jsonString.dataUsingEncoding(NSUTF8StringEncoding)!, options: [])
+        } catch let error1 as NSError {
+            error = error1
+            jsonObj = nil
+        }
         XCTAssert(jsonObj != nil)
         XCTAssert(error == nil)
 
@@ -30,11 +36,17 @@ class JSONParserTests: XCTestCase {
 
     func testCrazyParsing() {
         let jsonString = loadJSON("crazy")
-        XCTAssert(jsonString.utf16Count > 0)
+        XCTAssert(jsonString.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0)
 
         // NSJSONSerialization is not able to parse this thing
         var error: NSError?
-        let jsonObj: AnyObject? = NSJSONSerialization.JSONObjectWithData(jsonString.dataUsingEncoding(NSUTF8StringEncoding)!, options: nil, error: &error)
+        let jsonObj: AnyObject?
+        do {
+            jsonObj = try NSJSONSerialization.JSONObjectWithData(jsonString.dataUsingEncoding(NSUTF8StringEncoding)!, options: [])
+        } catch let error1 as NSError {
+            error = error1
+            jsonObj = nil
+        }
         XCTAssert(jsonObj == nil)
         XCTAssert(error != nil)
 
@@ -47,21 +59,23 @@ class JSONParserTests: XCTestCase {
         let jsonString = loadJSON("movies")
 
         measureBlock {
-            let jsonObj: AnyObject? = NSJSONSerialization.JSONObjectWithData(jsonString.dataUsingEncoding(NSUTF8StringEncoding)!, options: nil, error: nil)
+            do {
+                try NSJSONSerialization.JSONObjectWithData(jsonString.dataUsingEncoding(NSUTF8StringEncoding)!, options: [])
+            }
         }
     }
 
     func testSpeed() {
         let jsonString = loadJSON("movies")
         measureBlock {
-            let json = JSONParser(jsonString!)!.parse()
+            JSONParser(jsonString!)!.parse()
         }
     }
 
     func testSpeedCrazy() {
         let jsonString = loadJSON("crazy")
         measureBlock {
-            let json = JSONParser(jsonString!)!.parse()
+            JSONParser(jsonString!)!.parse()
         }
     }
 
@@ -75,7 +89,11 @@ class JSONParserTests: XCTestCase {
     func loadJSON(fileName: String) -> String! {
         let bundle = NSBundle(forClass: self.dynamicType)
         let url = bundle.URLForResource(fileName, withExtension: "json")
-        return String(contentsOfURL: url!, encoding: NSUTF8StringEncoding, error: nil)
+        do {
+            return try String(contentsOfURL: url!, encoding: NSUTF8StringEncoding)
+        } catch _ {
+            return nil
+        }
     }
 
     func toNumber(s: String) -> Double! {

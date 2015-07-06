@@ -34,7 +34,7 @@ private struct Stack<T> {
     }
 
     mutating func pop() -> T! {
-        var el = tail
+        let el = tail
         if el != nil {
 //          logIndented(self.size-1, "POP \(_stdlib_getDemangledTypeName(storage.last!))")
             tail = el.previous
@@ -47,7 +47,7 @@ private struct Stack<T> {
     }
 }
 
-public class JObject : JSONValue, DebugPrintable {
+public class JObject : JSONValue, CustomDebugStringConvertible {
     private var storage = [String : JSONValue]()
 
     public subscript(key: String) -> JSONValue! {
@@ -64,7 +64,7 @@ public class JObject : JSONValue, DebugPrintable {
     }
 }
 
-public class JArray : JSONValue, DebugPrintable {
+public class JArray : JSONValue, CustomDebugStringConvertible {
     private var storage = [JSONValue]()
 
     public subscript(index: Int) -> JSONValue! {
@@ -158,12 +158,26 @@ public enum TokenValue {
     }
 }
 
+enum TokenType {
+    case Null, Boolean, Number, String, Object, Array
+}
+
+class Token {
+    let type: TokenType
+    var pointer = UnsafePointer<Int8>(nil)
+    var length = 0
+
+    init(_ type: TokenType) {
+        self.type = type
+    }
+}
+
 public class JSONParser {
 
     private let json: UnsafePointer<Int8>
     private let length: Int
     private var position = 0
-    private var tokens = Stack<JSONValue>()
+    private var tokens = Stack<Token>()
 
     convenience init?(_ s: String) {
         if let data = s.dataUsingEncoding(NSUTF8StringEncoding) {
@@ -183,7 +197,7 @@ public class JSONParser {
         self.length = length
     }
 
-    init() {
+    private init() {
         json = UnsafePointer<Int8>(nil)
         length = 0
     }
@@ -193,13 +207,19 @@ public class JSONParser {
             let c = json[position]
             switch c {
             case 0x7b: // {
-                tokens.push(JObject())
+                var token = Token(.Object)
+                token.pointer = json + position
+                tokens.push(token)
             case 0x5b: // [
-                tokens.push(JArray())
+                var token = Token(.Array)
+                token.pointer = json + position
+                tokens.push(token)
+            case 0x5d:
+                
             case 0x7d, 0x5d: // }, ]
                 switch c {
-                case 0x7d: assert(tokens.peek() is JObject, "Unmatched Object closing bracket!")
-                default: assert(tokens.peek() is JArray, "Unmatched Array closing bracket!")
+                case 0x7d: assert(tokens.peek().type == .Object, "Unmatched Object closing bracket!")
+                default: assert(tokens.peek().type == .Array, "Unmatched Array closing bracket!")
                 }
                 let lastToken = tokens.pop()
                 let parentToken = tokens.peek()
@@ -322,8 +342,8 @@ public class JSONParser {
     }
 
     private func convertToString(a: (UnsafePointer<Int8>, Int)?) -> String? {
-        if a != nil {
-            return NSString(bytes: a!.0, length: a!.1, encoding: NSUTF8StringEncoding)
+        if let (s, l) = a {
+            return NSString(bytes: s, length: l, encoding: NSUTF8StringEncoding)
         }
         return nil
     }
@@ -377,10 +397,10 @@ public class JSONParser {
 // MARK: Debugging Utilities
 
 private func *(left: Character, right: Int) -> String {
-    return reduce(0..<right, "") { "\($0.0)\(left)" }
+    return (0..<right).reduce("") { "\($0.0)\(left)" }
 }
 
 private func logIndented<T>(x: Int, s: T) {
     let tabs = ">" * x
-    println("\(tabs)\(s)")
+    print("\(tabs)\(s)")
 }
