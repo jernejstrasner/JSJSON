@@ -7,9 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B809126B1B4C1147007ADEFF /* SerializationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B809126A1B4C1147007ADEFF /* SerializationTests.swift */; };
 		B825FA161A4985C000FC4C0E /* JSJSON.h in Headers */ = {isa = PBXBuildFile; fileRef = B825FA151A4985C000FC4C0E /* JSJSON.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B825FA1C1A4985C000FC4C0E /* JSJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B825FA101A4985C000FC4C0E /* JSJSON.framework */; };
 		B826CD831A50BCEC00E9F7CE /* movies.json in Resources */ = {isa = PBXBuildFile; fileRef = B826CD821A50BCEC00E9F7CE /* movies.json */; };
+		B89C9DF31B4AE5E900765239 /* JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = B825FA2C1A4985FB00FC4C0E /* JSON.swift */; };
+		B89C9DF41B4AE5EA00765239 /* JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = B825FA2C1A4985FB00FC4C0E /* JSON.swift */; };
 		B8C98E311A53642D0061DC33 /* crazy.json in Resources */ = {isa = PBXBuildFile; fileRef = B8C98E301A53642D0061DC33 /* crazy.json */; };
 /* End PBXBuildFile section */
 
@@ -24,6 +27,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		B809126A1B4C1147007ADEFF /* SerializationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SerializationTests.swift; sourceTree = "<group>"; };
 		B825FA101A4985C000FC4C0E /* JSJSON.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JSJSON.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B825FA141A4985C000FC4C0E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B825FA151A4985C000FC4C0E /* JSJSON.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JSJSON.h; sourceTree = "<group>"; };
@@ -96,6 +100,7 @@
 		B825FA1F1A4985C000FC4C0E /* JSJSONTests */ = {
 			isa = PBXGroup;
 			children = (
+				B809126A1B4C1147007ADEFF /* SerializationTests.swift */,
 				B826CD821A50BCEC00E9F7CE /* movies.json */,
 				B8C98E301A53642D0061DC33 /* crazy.json */,
 				B825FA221A4985C000FC4C0E /* JSJSONTests.swift */,
@@ -225,6 +230,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B89C9DF31B4AE5E900765239 /* JSON.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -232,6 +238,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B809126B1B4C1147007ADEFF /* SerializationTests.swift in Sources */,
+				B89C9DF41B4AE5EA00765239 /* JSON.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
