@@ -51,6 +51,11 @@
                BlueprintName = "JSJSONTests"
                ReferencedContainer = "container:JSJSON.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "SerializationTests/testObjectiveC()">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
       <MacroExpansion>

@@ -40,6 +40,11 @@ class SerializationTests: XCTestCase {
         XCTAssertEqual("-772.1214842", toJSON(-772.1214842))
         XCTAssertEqual("3", toJSON(Int8(3)))
     }
+
+    func testString() {
+        XCTAssertEqual("\"test\"", toJSON("test"))
+        XCTAssertEqual("\"emoji😄\"", toJSON("emoji😄"))
+    }
     
     func testArray() {
         let a = [0, 8, 2, 1, 9, 0]
@@ -78,21 +83,36 @@ class SerializationTests: XCTestCase {
         XCTAssertEqual("{\"name\":\"George\",\"age\":43,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":[{\"name\":\"Ann\",\"age\":12,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null},{\"name\":\"Matt\",\"age\":18,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null}]}", toJSON(b))
     }
 
+    // Not supporting ObjC objects, here just for testing how much support we get for free
     func testObjectiveC() {
         // Note: The following fails because boolean values are represented as NSNumber in ObjC.
         // The value thus gets serialized as an integer of 0 or 1.
-        let a: NSNumber = true
+        let a = NSNumber(bool: true)
         XCTAssertEqual("true", toJSON(a))
 
-        // No idea why this fails and 2.3 works
-        let b: NSNumber = 8.3
+        // You can't use use the literal convertible feature if you want to maintain precison.
+        // Not sure about the reason yet.
+        // let b: NSNumber = 8.3
+        let b = NSNumber(float: 8.3)
         XCTAssertEqual("8.3", toJSON(b))
 
-        let c: NSNumber = 2.3
-        XCTAssertEqual("2.3", toJSON(c))
+        let c = NSNumber(int: 881)
+        XCTAssertEqual("881", toJSON(c))
 
         let d: NSArray = ["saf", 3, "asdasa", 8]
         XCTAssertEqual("[\"saf\",3,\"asdasa\",8]", toJSON(d))
+
+        let e: NSDictionary = ["a": 3, "b": "test", "c": 9.11]
+        let eSet: Set<String> = [
+            "{\"a\":3,\"c\":9.11,\"b\":\"test\"}",
+            "{\"a\":3,\"b\":\"test\",\"c\":9.11}",
+            "{\"b\":\"test\",\"a\":3,\"c\":9.11}",
+            "{\"b\":\"test\",\"c\":9.11,\"a\":3}",
+            "{\"c\":9.11,\"a\":3,\"b\":\"test\"}",
+            "{\"c\":9.11,\"b\":\"test\",\"a\":3}"
+        ]
+        let eJSON = toJSON(e)
+        XCTAssert(eSet.contains(eJSON), eJSON)
     }
 
 }
