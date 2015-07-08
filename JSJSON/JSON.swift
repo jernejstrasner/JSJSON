@@ -6,49 +6,51 @@
 //  Copyright (c) 2014 Jernej Strasner. All rights reserved.
 //
 
-func toJSON<T>(x: T) -> String {
-    return reflect(x).extract()
+enum JSONError : ErrorType {
+    case TypeNotSupported(Any.Type)
+}
+
+func toJSON<T>(x: T) throws -> String {
+    return try reflect(x).extract()
 }
 
 extension CollectionType {
 
-    func toJSON() -> String {
-        return reflect(self).extract()
+    func toJSON() throws -> String {
+        return try reflect(self).extract()
     }
 
 }
 
 private extension MirrorType {
 
-    func map<T>(@noescape transform: (String, MirrorType) -> T) -> [T] {
+    func mapChildren<T>(@noescape transform: (String, MirrorType) throws -> T) throws -> [T] {
         var array = [T]()
         for i in 0..<self.count {
-            array.append(transform(self[i]))
+            try array.append(transform(self[i]))
         }
         return array
     }
 
-    func extract() -> String {
+    func extract() throws -> String {
         switch self.disposition {
         case .Optional:
-            if self.count > 0 {
-                return self[0].1.extract()
+            guard self.count > 0 else {
+                return "null"
             }
-            return "null"
+            return try self[0].1.extract()
         case .IndexContainer:
-            return "[" + ",".join(self.map({ $1.extract() })) + "]"
+            return "[" + ",".join(try self.mapChildren{ try $1.extract() }) + "]"
         case .KeyContainer:
-            var array = [String]()
-            for i in 0..<self.count {
-                let el = self[i].1
+            let array = try self.mapChildren { name, el -> String in
                 guard let key = el[0].1.value as? String where el.disposition == .Tuple && el.count == 2 else {
-                    break
+                    throw JSONError.TypeNotSupported(self.valueType)
                 }
-                array.append("\""+key+"\":"+el[1].1.extract())
+                return try "\""+key+"\":"+el[1].1.extract()
             }
             return "{" + ",".join(array) + "}"
         case .Struct:
-            return "{" + ",".join(self.map({ "\""+$0.0+"\":"+$1.extract() })) + "}"
+            return "{" + ",".join(try self.mapChildren({ try "\""+$0.0+"\":"+$1.extract() })) + "}"
         default:
             switch self.value {
             case is Int, is Int8, is Int16, is Int32, is Int64, is UInt, is UInt8, is UInt16, is UInt32, is UInt64, is Float, is Double:
@@ -56,10 +58,9 @@ private extension MirrorType {
             case is String:
                 return "\"" + (self.value as! String) + "\""
             default:
-                break
+                throw JSONError.TypeNotSupported(self.valueType)
             }
         }
-        fatalError("Type not supported: \"\(self.valueType)\"")
     }
     
 }

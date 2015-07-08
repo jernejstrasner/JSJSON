@@ -33,25 +33,30 @@ struct Person {
 
 class SerializationTests: XCTestCase {
 
+    func testErrors() {
+        XCTAssertThrows(try toJSON(NSData()))
+        XCTAssertNoThrow(try toJSON(999))
+    }
+
     func testNumbers() {
-        XCTAssertEqual("1", toJSON(1))
-        XCTAssertEqual("0", toJSON(0))
-        XCTAssertEqual("8.3", toJSON(8.3))
-        XCTAssertEqual("-772.1214842", toJSON(-772.1214842))
-        XCTAssertEqual("3", toJSON(Int8(3)))
+        XCTAssertNoThrowEqual("1", try toJSON(1))
+        XCTAssertNoThrowEqual("0", try toJSON(0))
+        XCTAssertNoThrowEqual("8.3", try toJSON(8.3))
+        XCTAssertNoThrowEqual("-772.1214842", try toJSON(-772.1214842))
+        XCTAssertNoThrowEqual("3", try toJSON(Int8(3)))
     }
 
     func testString() {
-        XCTAssertEqual("\"test\"", toJSON("test"))
-        XCTAssertEqual("\"emoji😄\"", toJSON("emoji😄"))
+        XCTAssertNoThrowEqual("\"test\"", try toJSON("test"))
+        XCTAssertNoThrowEqual("\"emoji😄\"", try toJSON("emoji😄"))
     }
     
     func testArray() {
         let a = [0, 8, 2, 1, 9, 0]
-        XCTAssertEqual("[0,8,2,1,9,0]", a.toJSON())
+        XCTAssertNoThrowEqual("[0,8,2,1,9,0]", try a.toJSON())
 
         let b = [871.22, 9381.1123, -84812.1212, 2.398287733]
-        XCTAssertEqual("[871.22,9381.1123,-84812.1212,2.398287733]", b.toJSON())
+        XCTAssertNoThrowEqual("[871.22,9381.1123,-84812.1212,2.398287733]", try b.toJSON())
     }
 
     func testDictionary() {
@@ -68,51 +73,51 @@ class SerializationTests: XCTestCase {
             "{\"c\":813,\"b\":922,\"a\":9}",
             "{\"c\":813,\"a\":9,\"b\":922}",
         ]
-        XCTAssert(set.contains(a.toJSON()))
+        XCTAssertNoThrowEqual(true, set.contains(try a.toJSON()))
     }
 
     func testStruct() {
         let a = Person(name: "John", age: 32, children: nil)
-        XCTAssertEqual("{\"name\":\"John\",\"age\":32,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null}", toJSON(a))
+        XCTAssertNoThrowEqual("{\"name\":\"John\",\"age\":32,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null}", try toJSON(a))
 
         let b = Person(name: "George", age: 43, children: [
             Person(name: "Ann", age: 12, children: nil),
             Person(name: "Matt", age: 18, children: nil)
             ]
         )
-        XCTAssertEqual("{\"name\":\"George\",\"age\":43,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":[{\"name\":\"Ann\",\"age\":12,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null},{\"name\":\"Matt\",\"age\":18,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null}]}", toJSON(b))
+        XCTAssertNoThrowEqual("{\"name\":\"George\",\"age\":43,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":[{\"name\":\"Ann\",\"age\":12,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null},{\"name\":\"Matt\",\"age\":18,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null}]}", try toJSON(b))
     }
 
-    // Not supporting ObjC objects, here just for testing how much support we get for free
-    func testObjectiveC() {
-        // Note: The following fails because boolean values are represented as NSNumber in ObjC.
-        // The value thus gets serialized as an integer of 0 or 1.
-        let a = NSNumber(bool: true)
-        XCTAssertEqual("true", toJSON(a))
-
-        // You can't use use the literal convertible feature if you want to maintain precison.
-        // Not sure about the reason yet.
-        // let b: NSNumber = 8.3
-        let b = NSNumber(float: 8.3)
-        XCTAssertEqual("8.3", toJSON(b))
-
-        let c = NSNumber(int: 881)
-        XCTAssertEqual("881", toJSON(c))
-
-        let d: NSArray = ["saf", 3, "asdasa", 8]
-        XCTAssertEqual("[\"saf\",3,\"asdasa\",8]", toJSON(d))
-
-        let e: NSDictionary = ["a": 3, "b": "test", "c": 9.11]
-        let eSet: Set<String> = [
-            "{\"a\":3,\"c\":9.11,\"b\":\"test\"}",
-            "{\"a\":3,\"b\":\"test\",\"c\":9.11}",
-            "{\"b\":\"test\",\"a\":3,\"c\":9.11}",
-            "{\"b\":\"test\",\"c\":9.11,\"a\":3}",
-            "{\"c\":9.11,\"a\":3,\"b\":\"test\"}",
-            "{\"c\":9.11,\"b\":\"test\",\"a\":3}"
-        ]
-        let eJSON = toJSON(e)
-        XCTAssert(eSet.contains(eJSON), eJSON)
-    }
+//    // Not supporting ObjC objects, here just for testing how much support we get for free
+//    func testObjectiveC() {
+//        // Note: The following fails because boolean values are represented as NSNumber in ObjC.
+//        // The value thus gets serialized as an integer of 0 or 1.
+//        let a = NSNumber(bool: true)
+//        XCTAssertEqual("true", toJSON(a))
+//
+//        // You can't use use the literal convertible feature if you want to maintain precison.
+//        // Not sure about the reason yet.
+//        // let b: NSNumber = 8.3
+//        let b = NSNumber(float: 8.3)
+//        XCTAssertEqual("8.3", toJSON(b))
+//
+//        let c = NSNumber(int: 881)
+//        XCTAssertEqual("881", toJSON(c))
+//
+//        let d: NSArray = ["saf", 3, "asdasa", 8]
+//        XCTAssertEqual("[\"saf\",3,\"asdasa\",8]", toJSON(d))
+//
+//        let e: NSDictionary = ["a": 3, "b": "test", "c": 9.11]
+//        let eSet: Set<String> = [
+//            "{\"a\":3,\"c\":9.11,\"b\":\"test\"}",
+//            "{\"a\":3,\"b\":\"test\",\"c\":9.11}",
+//            "{\"b\":\"test\",\"a\":3,\"c\":9.11}",
+//            "{\"b\":\"test\",\"c\":9.11,\"a\":3}",
+//            "{\"c\":9.11,\"a\":3,\"b\":\"test\"}",
+//            "{\"c\":9.11,\"b\":\"test\",\"a\":3}"
+//        ]
+//        let eJSON = toJSON(e)
+//        XCTAssert(eSet.contains(eJSON), eJSON)
+//    }
 
 }

@@ -14,6 +14,7 @@
 		B89C9DF31B4AE5E900765239 /* JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = B825FA2C1A4985FB00FC4C0E /* JSON.swift */; };
 		B89C9DF41B4AE5EA00765239 /* JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = B825FA2C1A4985FB00FC4C0E /* JSON.swift */; };
 		B8C98E311A53642D0061DC33 /* crazy.json in Resources */ = {isa = PBXBuildFile; fileRef = B8C98E301A53642D0061DC33 /* crazy.json */; };
+		B8E21DCA1B4D5D210072D407 /* XCTAssertAdditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E21DC91B4D5D210072D407 /* XCTAssertAdditions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,6 +40,7 @@
 		B826CD841A5156A700E9F7CE /* JSONParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONParser.swift; sourceTree = "<group>"; };
 		B826CD861A5156B700E9F7CE /* JSONParserTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONParserTests.swift; sourceTree = "<group>"; };
 		B8C98E301A53642D0061DC33 /* crazy.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = crazy.json; sourceTree = "<group>"; };
+		B8E21DC91B4D5D210072D407 /* XCTAssertAdditions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XCTAssertAdditions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +102,7 @@
 		B825FA1F1A4985C000FC4C0E /* JSJSONTests */ = {
 			isa = PBXGroup;
 			children = (
+				B8E21DC91B4D5D210072D407 /* XCTAssertAdditions.swift */,
 				B809126A1B4C1147007ADEFF /* SerializationTests.swift */,
 				B826CD821A50BCEC00E9F7CE /* movies.json */,
 				B8C98E301A53642D0061DC33 /* crazy.json */,
@@ -240,6 +243,7 @@
 			files = (
 				B809126B1B4C1147007ADEFF /* SerializationTests.swift in Sources */,
 				B89C9DF41B4AE5EA00765239 /* JSON.swift in Sources */,
+				B8E21DCA1B4D5D210072D407 /* XCTAssertAdditions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
