@@ -46,3 +46,12 @@ func XCTAssertNoThrowEqual<T : Equatable>(@autoclosure expression1: () -> T, @au
         XCTFail("Caught error: \(error) - \(message)", file: file, line: line)
     }
 }
+
+func XCTAssertNoThrowValidateValue<T>(@autoclosure expression: () throws -> T, _ message: String = "", file: String = __FILE__, line: UInt = __LINE__, _ validator: (T) -> Bool) {
+    do {
+        let result = try expression()
+        XCTAssert(validator(result), "Value validation failed - \(message)", file: file, line: line)
+    } catch let error {
+        XCTFail("Caught error: \(error) - \(message)", file: file, line: line)
+    }
+}

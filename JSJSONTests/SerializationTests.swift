@@ -73,7 +73,7 @@ class SerializationTests: XCTestCase {
             "{\"c\":813,\"b\":922,\"a\":9}",
             "{\"c\":813,\"a\":9,\"b\":922}",
         ]
-        XCTAssertNoThrowEqual(true, set.contains(try a.toJSON()))
+        XCTAssertNoThrowValidateValue(try a.toJSON()) { set.contains($0) }
     }
 
     func testStruct() {
