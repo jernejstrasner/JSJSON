@@ -8,7 +8,7 @@
 
 import XCTest
 
-class JSONParserTests: XCTestCase {
+class ParsingTests: XCTestCase {
 
     func testSimpleParsing() {
         let jsonString = loadJSON("movies")
