@@ -104,10 +104,9 @@
 		B825FA1F1A4985C000FC4C0E /* JSJSONTests */ = {
 			isa = PBXGroup;
 			children = (
+				B8A0E2661B52816700F006EB /* Resources */,
 				B8E21DC91B4D5D210072D407 /* XCTAssertAdditions.swift */,
 				B809126A1B4C1147007ADEFF /* SerializationTests.swift */,
-				B826CD821A50BCEC00E9F7CE /* movies.json */,
-				B8C98E301A53642D0061DC33 /* crazy.json */,
 				B826CD861A5156B700E9F7CE /* JSONParserTests.swift */,
 				B825FA201A4985C000FC4C0E /* Supporting Files */,
 			);
@@ -120,6 +119,15 @@
 				B825FA211A4985C000FC4C0E /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		B8A0E2661B52816700F006EB /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				B826CD821A50BCEC00E9F7CE /* movies.json */,
+				B8C98E301A53642D0061DC33 /* crazy.json */,
+			);
+			name = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
