@@ -26,7 +26,7 @@ class ParsingTests: XCTestCase {
         XCTAssert(error == nil)
 
         let parser = JSONParser(jsonString)
-        XCTAssertNotNil(parser)
+        XCTAssert(parser != nil)
         XCTAssertNoThrow(try parser!.parse())
 
 //        // Check integrity
@@ -53,7 +53,7 @@ class ParsingTests: XCTestCase {
 
         // We can!
         let parser = JSONParser(jsonString)
-        XCTAssertNotNil(parser)
+        XCTAssert(parser != nil)
         XCTAssertNoThrow(try parser!.parse())
     }
 

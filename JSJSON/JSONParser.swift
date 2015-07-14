@@ -29,25 +29,6 @@ private struct Stack<T> {
 
 }
 
-public protocol JSONValue {}
-
-extension Bool : JSONValue {}
-extension Int : JSONValue {}
-extension Int8 : JSONValue {}
-extension Int16 : JSONValue {}
-extension Int32 : JSONValue {}
-extension Int64 : JSONValue {}
-extension UInt : JSONValue {}
-extension UInt8 : JSONValue {}
-extension UInt16 : JSONValue {}
-extension UInt32 : JSONValue {}
-extension UInt64 : JSONValue {}
-extension Float : JSONValue {}
-extension Double : JSONValue {}
-extension String : JSONValue {}
-extension Array : JSONValue {}
-extension Dictionary : JSONValue {}
-
 public enum TokenValue {
     case Null
     case N(Double)
@@ -117,7 +98,7 @@ struct Token {
 
 }
 
-public class JSONParser {
+public struct JSONParser {
 
     enum Error : ErrorType {
         case UnmatchedObjectClosingBracket
@@ -130,10 +111,8 @@ public class JSONParser {
     
     private let json: UnsafePointer<Int8>
     private let length: Int
-    private var position = 0
-    private var tokens = Stack<Token>()
 
-    convenience init?(_ s: String) {
+    init?(_ s: String) {
         if let data = s.dataUsingEncoding(NSUTF8StringEncoding) {
             self.init(bytes: UnsafePointer<Int8>(data.bytes), length: data.length)
         } else {
@@ -141,7 +120,7 @@ public class JSONParser {
         }
     }
 
-    convenience init(_ data: NSData) {
+    init(_ data: NSData) {
         self.init(bytes: UnsafePointer<Int8>(data.bytes), length: data.length)
     }
 
@@ -150,12 +129,9 @@ public class JSONParser {
         self.length = length
     }
 
-    private init() {
-        json = UnsafePointer<Int8>(nil)
-        length = 0
-    }
-
     func parse() throws {
+        var tokens = Stack<Token>()
+        var position = 0
         for ; position < length; position++ {
             let c = json[position]
             switch c {
@@ -171,14 +147,14 @@ public class JSONParser {
                 // Blank space
                 break
             case 0x22: // "
-                let token = try parseString()
+                let token = try parseString(&position)
                 tokens.push(token)
             case 0x3a: // :
                 tokens.push(Token(kind: .Colon, pointer: json + position, length: 1))
             case 0x2c: // ,
                 tokens.push(Token(kind: .Comma, pointer: json + position, length: 1))
             case 0x2d, 0x30...0x39, 0x74, 0x66, 0x6e: // -, 0-9, t, f, n
-                let token = try parsePrimitive()
+                let token = try parsePrimitive(&position)
                 tokens.push(token)
             default:
                 throw Error.UnexpectedCharacter
@@ -186,7 +162,7 @@ public class JSONParser {
         }
     }
 
-    private func parseString() throws -> Token {
+    private func parseString(inout position: Int) throws -> Token {
         // Skip the opening "
         position++
         let start = position
@@ -231,7 +207,7 @@ public class JSONParser {
 //    case 0x66:  value = false
 //    default:    value = convertToNumber(primitive)
 
-    private func parsePrimitive() throws -> Token {
+    private func parsePrimitive(inout position: Int) throws -> Token {
         // Get the type
         var kind: Token.Kind
         switch json[position] {
@@ -300,15 +276,4 @@ public class JSONParser {
 //        return nil
 //    }
 
-}
-
-// MARK: Debugging Utilities
-
-private func *(left: Character, right: Int) -> String {
-    return (0..<right).reduce("") { "\($0.0)\(left)" }
-}
-
-private func logIndented<T>(x: Int, s: T) {
-    let tabs = ">" * x
-    print("\(tabs)\(s)")
 }
