@@ -10,59 +10,45 @@ import Foundation
 
 public enum TokenValue {
     case Null
-    case N(Double)
-    case S(String)
-    case B(Bool)
-    case A([TokenValue])
-    case O([String:TokenValue])
+    case Number(Double)
+    case Text(String)
+    case Boolean(Bool)
+    case Array([TokenValue])
+    case Object([String:TokenValue])
 
     var isNull: Bool {
-        switch self {
-        case .Null: return true
-        default: return false
-        }
+        if case .Null = self { return true }
+        return false
     }
 
     var string: String? {
-        switch self {
-        case .S(let s): return s
-        default: return nil
-        }
+        if case .Text(let text) = self { return text }
+        return nil
     }
 
     var number: Double? {
-        switch self {
-        case .N(let d): return d
-        default: return nil
-        }
+        if case .Number(let number) = self { return number }
+        return nil
     }
 
     var bool: Bool? {
-        switch self {
-        case .B(let b): return b
-        default: return nil
-        }
+        if case .Boolean(let boolean) = self { return boolean }
+        return nil
     }
 
     subscript(index: Int) -> TokenValue? {
-        switch self {
-        case .A(let a) where a.count > index: return a[index]
-        default: return nil
-        }
+        if case .Array(let array) = self where array.count > index { return array[index] }
+        return nil
     }
 
     subscript(key: String) -> TokenValue? {
-        switch self {
-        case .O(let o): return o[key]
-        default: return nil
-        }
+        if case .Object(let object) = self { return object[key] }
+        return nil
     }
 
     var last: TokenValue? {
-        switch self {
-        case .A(let a): return a.last
-        default: return nil
-        }
+        if case .Array(let array) = self { return array.last }
+        return nil
     }
 }
 
@@ -71,11 +57,11 @@ extension TokenValue : CustomDebugStringConvertible {
     public var debugDescription: String {
         switch self {
         case .Null: return "Null"
-        case .B(let b): return "Boolean(\(b))"
-        case .N(let n): return "Number(\(n))"
-        case .S(let s): return "String(\(s))"
-        case .A(let a): return "Array(\(a))"
-        case .O(let o): return "Object(\(o))"
+        case .Boolean(let b): return "Boolean(\(b))"
+        case .Number(let n): return "Number(\(n))"
+        case .Text(let s): return "Text(\(s))"
+        case .Array(let a): return "Array(\(a))"
+        case .Object(let o): return "Object(\(o))"
         }
     }
 
@@ -110,8 +96,8 @@ struct Token {
             return TokenValue.Null
         case .Boolean:
             switch pointer[0] {
-            case 0x74: return TokenValue.B(true)
-            case 0x66: return TokenValue.B(false)
+            case 0x74: return TokenValue.Boolean(true)
+            case 0x66: return TokenValue.Boolean(false)
             default: throw JSONParser.Error.InvalidBoolean
             }
         case .Number:
@@ -145,10 +131,10 @@ struct Token {
                     number = Double(strtoull(pointer, nil, 10))
                 }
             }
-            return TokenValue.N(number)
+            return TokenValue.Number(number)
         case .String:
             let string = try buildString()
-            return TokenValue.S(string)
+            return TokenValue.Text(string)
         default:
             throw JSONParser.Error.NotAValueType
         }
@@ -269,7 +255,7 @@ public struct JSONParser {
             // ObjectEnd or Comma
             let lastToken = tokens[++position]
             switch lastToken.kind {
-            case .ObjectEnd: return TokenValue.O(object)
+            case .ObjectEnd: return TokenValue.Object(object)
             case .Comma: break
             default: throw Error.InvalidObject
             }
@@ -297,7 +283,7 @@ public struct JSONParser {
             // ArrayEnd or Comma
             let lastToken = tokens[++position]
             switch lastToken.kind {
-            case .ArrayEnd: return TokenValue.A(array)
+            case .ArrayEnd: return TokenValue.Array(array)
             case .Comma: break
             default: throw Error.InvalidArray
             }
