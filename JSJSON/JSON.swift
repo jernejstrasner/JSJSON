@@ -14,12 +14,19 @@ func toJSON<T>(x: T) throws -> String {
     return try reflect(x).extract()
 }
 
-extension CollectionType {
+protocol JSON_String {}
+extension String : JSON_String {}
 
+extension Array where Element: Hashable {
     func toJSON() throws -> String {
         return try reflect(self).extract()
     }
+}
 
+extension Dictionary where Key: JSON_String, Value: Hashable {
+    func toJSON() throws -> String {
+        return try reflect(self).extract()
+    }
 }
 
 private extension MirrorType {
