@@ -11,8 +11,7 @@ import XCTest
 class ParsingTests: XCTestCase {
 
     func testSimpleParsing() {
-        let jsonString = loadJSON("movies")
-        XCTAssert(jsonString != nil)
+        let jsonString = SWIFTAssertNoThrow(try loadJSON("movies"))!
 
         var error: NSError?
         let jsonObj: AnyObject?
@@ -39,8 +38,7 @@ class ParsingTests: XCTestCase {
     }
 
     func testCrazyParsing() {
-        let jsonString = loadJSON("crazy")
-        XCTAssert(jsonString.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0)
+        let jsonString = SWIFTAssertNoThrow(try loadJSON("crazy"))!
 
         // NSJSONSerialization is not able to parse this thing
         SWIFTAssertThrows(try NSJSONSerialization.JSONObjectWithData(jsonString.dataUsingEncoding(NSUTF8StringEncoding)!, options: []))
@@ -52,8 +50,18 @@ class ParsingTests: XCTestCase {
         XCTAssert(data != nil)
     }
 
+    func testBigParsing() {
+        let jsonString = SWIFTAssertNoThrow(try loadJSON("citylots"))!
+
+        // Test our parser
+        let parser = JSONParser(jsonString)
+        XCTAssert(parser != nil)
+        let data = SWIFTAssertNoThrow(try parser!.parse())
+        XCTAssert(data != nil)
+    }
+
     func testCocoaSpeed() {
-        let jsonString = loadJSON("movies")
+        let jsonString = SWIFTAssertNoThrow(try loadJSON("movies"))!
 
         measureBlock {
             do {
@@ -63,7 +71,8 @@ class ParsingTests: XCTestCase {
     }
 
     func testSpeed() {
-        let jsonString = loadJSON("movies")
+        let jsonString = SWIFTAssertNoThrow(try loadJSON("movies"))!
+
         measureBlock {
             do {
                 try JSONParser(jsonString)!.parse()
@@ -71,35 +80,36 @@ class ParsingTests: XCTestCase {
         }
     }
 
-    func testSpeedCrazy() {
-        let jsonString = loadJSON("crazy")
+    func testBigSpeedCocoa() {
+        let jsonString = SWIFTAssertNoThrow(try loadJSON("10meg"))!
+
         measureBlock {
             do {
-                try JSONParser(jsonString!)!.parse()
+                try NSJSONSerialization.JSONObjectWithData(jsonString.dataUsingEncoding(NSUTF8StringEncoding)!, options: [])
             } catch {}
         }
     }
 
-//    func testNumberConversion() {
-//        XCTAssert(toNumber("399") == 399)
-//        XCTAssert(toNumber("1.53") == 1.53)
-//        XCTAssert(toNumber("-0.344") == -0.344)
-//        XCTAssert(toNumber("1.3e4") == 1.3e4)
-//    }
+    func testBigSpeed() {
+        let jsonString = SWIFTAssertNoThrow(try loadJSON("10meg"))!
 
-    func loadJSON(fileName: String) -> String! {
-        let bundle = NSBundle(forClass: self.dynamicType)
-        let url = bundle.URLForResource(fileName, withExtension: "json")
-        do {
-            return try String(contentsOfURL: url!, encoding: NSUTF8StringEncoding)
-        } catch {
-            return nil
+        measureBlock {
+            do {
+                try JSONParser(jsonString)!.parse()
+            } catch {}
         }
     }
 
-//    func toNumber(s: String) -> Double! {
-//        let a = ((s as NSString).UTF8String, (s as NSString).lengthOfBytesUsingEncoding(NSUTF8StringEncoding))
-//        return JSONParser(s)!.convertToNumber(a)
-//    }
+    enum Error : ErrorType {
+        case MissingFile
+    }
+
+    func loadJSON(fileName: String) throws -> String {
+        let bundle = NSBundle(forClass: self.dynamicType)
+        if let url = bundle.URLForResource(fileName, withExtension: "json") {
+            return try String(contentsOfURL: url, encoding: NSUTF8StringEncoding)
+        }
+        throw Error.MissingFile
+    }
 
 }

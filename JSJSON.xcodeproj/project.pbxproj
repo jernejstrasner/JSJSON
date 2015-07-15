@@ -16,6 +16,10 @@
 		B8A685941B5032AE001FF943 /* JSONParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B826CD841A5156A700E9F7CE /* JSONParser.swift */; };
 		B8A685951B5032AF001FF943 /* JSONParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B826CD841A5156A700E9F7CE /* JSONParser.swift */; };
 		B8C98E311A53642D0061DC33 /* crazy.json in Resources */ = {isa = PBXBuildFile; fileRef = B8C98E301A53642D0061DC33 /* crazy.json */; };
+		B8DCE01B1B56AC6D004912D6 /* citylots.json in Resources */ = {isa = PBXBuildFile; fileRef = B8DCE01A1B56AC6D004912D6 /* citylots.json */; };
+		B8DCE01F1B56C914004912D6 /* 1meg.json in Resources */ = {isa = PBXBuildFile; fileRef = B8DCE01C1B56C914004912D6 /* 1meg.json */; };
+		B8DCE0201B56C914004912D6 /* 10meg.json in Resources */ = {isa = PBXBuildFile; fileRef = B8DCE01D1B56C914004912D6 /* 10meg.json */; };
+		B8DCE0211B56C914004912D6 /* 30meg.json in Resources */ = {isa = PBXBuildFile; fileRef = B8DCE01E1B56C914004912D6 /* 30meg.json */; };
 		B8E21DCA1B4D5D210072D407 /* XCTAssertAdditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E21DC91B4D5D210072D407 /* XCTAssertAdditions.swift */; };
 		B8EC4D3F1B51468C00AB15CC /* ParsingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B826CD861A5156B700E9F7CE /* ParsingTests.swift */; };
 /* End PBXBuildFile section */
@@ -42,6 +46,10 @@
 		B826CD841A5156A700E9F7CE /* JSONParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONParser.swift; sourceTree = "<group>"; };
 		B826CD861A5156B700E9F7CE /* ParsingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParsingTests.swift; sourceTree = "<group>"; };
 		B8C98E301A53642D0061DC33 /* crazy.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = crazy.json; sourceTree = "<group>"; };
+		B8DCE01A1B56AC6D004912D6 /* citylots.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = citylots.json; sourceTree = "<group>"; };
+		B8DCE01C1B56C914004912D6 /* 1meg.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 1meg.json; sourceTree = "<group>"; };
+		B8DCE01D1B56C914004912D6 /* 10meg.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 10meg.json; sourceTree = "<group>"; };
+		B8DCE01E1B56C914004912D6 /* 30meg.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 30meg.json; sourceTree = "<group>"; };
 		B8E21DC91B4D5D210072D407 /* XCTAssertAdditions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XCTAssertAdditions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -124,10 +132,14 @@
 		B8A0E2661B52816700F006EB /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				B826CD821A50BCEC00E9F7CE /* movies.json */,
+				B8DCE01C1B56C914004912D6 /* 1meg.json */,
+				B8DCE01D1B56C914004912D6 /* 10meg.json */,
+				B8DCE01E1B56C914004912D6 /* 30meg.json */,
+				B8DCE01A1B56AC6D004912D6 /* citylots.json */,
 				B8C98E301A53642D0061DC33 /* crazy.json */,
+				B826CD821A50BCEC00E9F7CE /* movies.json */,
 			);
-			name = Resources;
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -230,8 +242,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B8DCE0211B56C914004912D6 /* 30meg.json in Resources */,
 				B826CD831A50BCEC00E9F7CE /* movies.json in Resources */,
 				B8C98E311A53642D0061DC33 /* crazy.json in Resources */,
+				B8DCE01B1B56AC6D004912D6 /* citylots.json in Resources */,
+				B8DCE01F1B56C914004912D6 /* 1meg.json in Resources */,
+				B8DCE0201B56C914004912D6 /* 10meg.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
