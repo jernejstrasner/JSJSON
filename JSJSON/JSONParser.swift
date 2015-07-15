@@ -96,17 +96,86 @@ struct Token {
         self.length = length
     }
 
+    var isValueType: Bool {
+        switch kind {
+        case .Null, .Boolean, .Number, .String: return true
+        default: return false
+        }
+    }
+
+    func parseValue() throws -> TokenValue {
+        switch kind {
+        case .Null:
+            return TokenValue.Null
+        case .Boolean:
+            switch pointer[0] {
+            case 0x74: return TokenValue.B(true)
+            case 0x66: return TokenValue.B(false)
+            default: throw JSONParser.Error.InvalidBoolean
+            }
+        case .Number:
+            var isFloatingPoint = false
+            var isNegative = false
+
+            // Check if we have a valid number and determine if it's a float and/or negative
+            for var i = 0; i < length; i++ {
+                switch pointer[i] {
+                case 0x2d where i == 0 || isFloatingPoint:
+                    isNegative = true
+                case 0x2e, 0x45, 0x65 where i > 0:
+                    isFloatingPoint = true
+                case 0x2b where i > 0:
+                    continue
+                case 0x30...0x39:
+                    continue
+                default:
+                    throw JSONParser.Error.InvalidNumber
+                }
+            }
+
+            // Parse the number
+            var number: Double
+            if isFloatingPoint {
+                number = strtod(pointer, nil)
+            } else {
+                if isNegative {
+                    number = Double(strtoll(pointer, nil, 10))
+                } else {
+                    number = Double(strtoull(pointer, nil, 10))
+                }
+            }
+            return TokenValue.N(number)
+        case .String:
+            let string = try buildString()
+            return TokenValue.S(string)
+        default:
+            throw JSONParser.Error.NotAValueType
+        }
+    }
+
+    func buildString() throws -> String {
+        if let string = NSString(bytes: pointer, length: length, encoding: NSUTF8StringEncoding) as? String {
+            return string
+        }
+        throw JSONParser.Error.InvalidString
+    }
+
 }
 
 public struct JSONParser {
 
     enum Error : ErrorType {
-        case UnmatchedObjectClosingBracket
-        case UnmatchedArrayClosingBracket
         case StringInvalidHexCharacter
         case StringUnexpectedSymbol
-        case InvalidPrimitive
         case UnexpectedCharacter
+        case InvalidPrimitive
+        case InvalidObject
+        case InvalidString
+        case InvalidNumber
+        case InvalidBoolean
+        case InvalidArray
+        case UnexpectedRootNodeType
+        case NotAValueType
     }
     
     private let json: UnsafePointer<Int8>
@@ -129,7 +198,7 @@ public struct JSONParser {
         self.length = length
     }
 
-    func parse() throws {
+    func parse() throws -> TokenValue {
         var tokens = Stack<Token>()
         var position = 0
         for ; position < length; position++ {
@@ -160,6 +229,86 @@ public struct JSONParser {
                 throw Error.UnexpectedCharacter
             }
         }
+
+        var c = 0
+        tokens.items.map { print("\(c++) -> \($0)") }
+
+        var stackLocation = 0
+        if tokens.items.first?.kind == .ObjectStart {
+            return try buildObject(&tokens, position: &stackLocation)
+        } else if tokens.items.first?.kind == .ArrayStart {
+            return try buildArray(&tokens, position: &stackLocation)
+        } else {
+            throw Error.UnexpectedRootNodeType
+        }
+    }
+
+    private func buildObject(inout stack: Stack<Token>, inout position: Int) throws -> TokenValue {
+        var object = [String:TokenValue]()
+        position++ // Skip ObjectStart
+        while position < stack.items.count {
+            // Key
+            let keyToken = stack.items[position]
+            print("\(position) -> \(keyToken)")
+            guard keyToken.kind == .String else {
+                throw Error.InvalidObject
+            }
+            let key = try keyToken.buildString()
+            // Colon
+            guard stack.items[++position].kind == .Colon else {
+                throw Error.InvalidObject
+            }
+            // Value
+            let valueToken = stack.items[++position]
+            if valueToken.isValueType {
+                object[key] = try valueToken.parseValue()
+            } else if valueToken.kind == .ArrayStart {
+                object[key] = try buildArray(&stack, position: &position)
+            } else if valueToken.kind == .ObjectStart {
+                object[key] = try buildObject(&stack, position: &position)
+            } else {
+                throw Error.InvalidObject
+            }
+            // ObjectEnd or Comma
+            let lastToken = stack.items[++position]
+            switch lastToken.kind {
+            case .ObjectEnd: return TokenValue.O(object)
+            case .Comma: break
+            default: throw Error.InvalidObject
+            }
+            ++position
+        }
+        // At the end of the stack but no ObjectEnd
+        throw Error.InvalidObject
+    }
+
+    private func buildArray(inout stack: Stack<Token>, inout position: Int) throws -> TokenValue {
+        var array = [TokenValue]()
+        position++ // Skip ArrayStart
+        while position < stack.items.count {
+            // Element
+            let elementToken = stack.items[position]
+            print("\(position) -> \(elementToken)")
+            if elementToken.isValueType {
+                array.append(try elementToken.parseValue())
+            } else if elementToken.kind == .ArrayStart {
+                array.append(try buildArray(&stack, position: &position))
+            } else if elementToken.kind == .ObjectStart {
+                array.append(try buildObject(&stack, position: &position))
+            } else {
+                throw Error.InvalidArray
+            }
+            // ArrayEnd or Comma
+            let lastToken = stack.items[++position]
+            switch lastToken.kind {
+            case .ArrayEnd: return TokenValue.A(array)
+            case .Comma: break
+            default: throw Error.InvalidArray
+            }
+            ++position
+        }
+        // At the end of the stack but no ArrayEnd
+        throw Error.InvalidArray
     }
 
     private func parseString(inout position: Int) throws -> Token {
@@ -230,50 +379,5 @@ public struct JSONParser {
         // Error
         throw Error.InvalidPrimitive
     }
-
-//    private func convertToString(a: ValueToken) throws -> String {
-//        if let (s, l) = a, let string = NSString(bytes: s, length: l, encoding: NSUTF8StringEncoding) as? String {
-//            return string
-//        }
-//        return nil
-//    }
-
-//    func convertToNumber(a: Pointer?) -> Double? {
-//        if let (s, l) = a {
-//
-//            var isFloatingPoint = false
-//            var isNegative = false
-//
-//            // Check if we have a valid number and determine if it's a float and/or negative
-//            for var i = 0; i < l; i++ {
-//                switch s[i] {
-//                case 0x2d where i == 0 || isFloatingPoint:
-//                    isNegative = true
-//                case 0x2e, 0x45, 0x65 where i > 0:
-//                    isFloatingPoint = true
-//                case 0x2b where i > 0:
-//                    continue
-//                case 0x30...0x39:
-//                    continue
-//                default:
-//                    fatalError("Invalid number!")
-//                }
-//            }
-//
-//            // Parse the number
-//            var number: Double
-//            if isFloatingPoint {
-//                number = strtod(s, nil)
-//            } else {
-//                if isNegative {
-//                    number = Double(strtoll(s, nil, 10))
-//                } else {
-//                    number = Double(strtoull(s, nil, 10))
-//                }
-//            }
-//            return number
-//        }
-//        return nil
-//    }
 
 }
