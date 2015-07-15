@@ -8,27 +8,6 @@
 
 import Foundation
 
-private struct Stack<T> {
-
-    private(set) var items = [T]()
-
-    mutating func push(el: T) {
-        items.append(el)
-    }
-
-    mutating func pop() -> T? {
-        if items.count > 0 {
-            return items.removeLast()
-        }
-        return nil
-    }
-
-    func peek() -> T? {
-        return items.last
-    }
-
-}
-
 public enum TokenValue {
     case Null
     case N(Double)
@@ -221,74 +200,74 @@ public struct JSONParser {
     }
 
     func parse() throws -> TokenValue {
-        var tokens = Stack<Token>()
+        var tokens = Array<Token>()
         var position = 0
         for ; position < length; position++ {
             let c = json[position]
             switch c {
             case 0x7b: // {
-                tokens.push(Token(kind: .ObjectStart, pointer: json + position, length: 1))
+                tokens.append(Token(kind: .ObjectStart, pointer: json + position, length: 1))
             case 0x5b: // [
-                tokens.push(Token(kind: .ArrayStart, pointer: json + position, length: 1))
+                tokens.append(Token(kind: .ArrayStart, pointer: json + position, length: 1))
             case 0x5d: // ]
-                tokens.push(Token(kind: .ArrayEnd, pointer: json + position, length: 1))
+                tokens.append(Token(kind: .ArrayEnd, pointer: json + position, length: 1))
             case 0x7d: // }
-                tokens.push(Token(kind: .ObjectEnd, pointer: json + position, length: 1))
+                tokens.append(Token(kind: .ObjectEnd, pointer: json + position, length: 1))
             case 0x9, 0x0d, 0x0a, 0x20: // \t, \r, \n, (space)
                 // Blank space
                 break
             case 0x22: // "
                 let token = try parseString(&position)
-                tokens.push(token)
+                tokens.append(token)
             case 0x3a: // :
-                tokens.push(Token(kind: .Colon, pointer: json + position, length: 1))
+                tokens.append(Token(kind: .Colon, pointer: json + position, length: 1))
             case 0x2c: // ,
-                tokens.push(Token(kind: .Comma, pointer: json + position, length: 1))
+                tokens.append(Token(kind: .Comma, pointer: json + position, length: 1))
             case 0x2d, 0x30...0x39, 0x74, 0x66, 0x6e: // -, 0-9, t, f, n
                 let token = try parsePrimitive(&position)
-                tokens.push(token)
+                tokens.append(token)
             default:
                 throw Error.UnexpectedCharacter
             }
         }
 
         var stackLocation = 0
-        if tokens.items.first?.kind == .ObjectStart {
+        if tokens.first?.kind == .ObjectStart {
             return try buildObject(&tokens, position: &stackLocation)
-        } else if tokens.items.first?.kind == .ArrayStart {
+        } else if tokens.first?.kind == .ArrayStart {
             return try buildArray(&tokens, position: &stackLocation)
         } else {
             throw Error.UnexpectedRootNodeType
         }
     }
 
-    private func buildObject(inout stack: Stack<Token>, inout position: Int) throws -> TokenValue {
+    private func buildObject(inout tokens: Array<Token>, inout position: Int) throws -> TokenValue {
         var object = [String:TokenValue]()
         position++ // Skip ObjectStart
-        while position < stack.items.count {
+        while position < tokens.count {
             // Key
-            let keyToken = stack.items[position]
+            let keyToken = tokens[position]
             guard keyToken.kind == .String else {
                 throw Error.InvalidObject
             }
             let key = try keyToken.buildString()
             // Colon
-            guard stack.items[++position].kind == .Colon else {
+            guard tokens[++position].kind == .Colon else {
                 throw Error.InvalidObject
             }
             // Value
-            let valueToken = stack.items[++position]
+            let valueToken = tokens[++position]
             if valueToken.isValueType {
                 object[key] = try valueToken.parseValue()
             } else if valueToken.kind == .ArrayStart {
-                object[key] = try buildArray(&stack, position: &position)
+                object[key] = try buildArray(&tokens, position: &position)
             } else if valueToken.kind == .ObjectStart {
-                object[key] = try buildObject(&stack, position: &position)
+                object[key] = try buildObject(&tokens, position: &position)
             } else {
                 throw Error.InvalidObject
             }
             // ObjectEnd or Comma
-            let lastToken = stack.items[++position]
+            let lastToken = tokens[++position]
             switch lastToken.kind {
             case .ObjectEnd: return TokenValue.O(object)
             case .Comma: break
@@ -300,23 +279,23 @@ public struct JSONParser {
         throw Error.InvalidObject
     }
 
-    private func buildArray(inout stack: Stack<Token>, inout position: Int) throws -> TokenValue {
+    private func buildArray(inout tokens: Array<Token>, inout position: Int) throws -> TokenValue {
         var array = [TokenValue]()
         position++ // Skip ArrayStart
-        while position < stack.items.count {
+        while position < tokens.count {
             // Element
-            let elementToken = stack.items[position]
+            let elementToken = tokens[position]
             if elementToken.isValueType {
                 array.append(try elementToken.parseValue())
             } else if elementToken.kind == .ArrayStart {
-                array.append(try buildArray(&stack, position: &position))
+                array.append(try buildArray(&tokens, position: &position))
             } else if elementToken.kind == .ObjectStart {
-                array.append(try buildObject(&stack, position: &position))
+                array.append(try buildObject(&tokens, position: &position))
             } else {
                 throw Error.InvalidArray
             }
             // ArrayEnd or Comma
-            let lastToken = stack.items[++position]
+            let lastToken = tokens[++position]
             switch lastToken.kind {
             case .ArrayEnd: return TokenValue.A(array)
             case .Comma: break
