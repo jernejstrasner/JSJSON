@@ -100,16 +100,4 @@ class ParsingTests: XCTestCase {
         }
     }
 
-    enum Error : ErrorType {
-        case MissingFile
-    }
-
-    func loadJSON(fileName: String) throws -> String {
-        let bundle = NSBundle(forClass: self.dynamicType)
-        if let url = bundle.URLForResource(fileName, withExtension: "json") {
-            return try String(contentsOfURL: url, encoding: NSUTF8StringEncoding)
-        }
-        throw Error.MissingFile
-    }
-
 }

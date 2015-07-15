@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B809126B1B4C1147007ADEFF /* SerializationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B809126A1B4C1147007ADEFF /* SerializationTests.swift */; };
 		B825FA161A4985C000FC4C0E /* JSJSON.h in Headers */ = {isa = PBXBuildFile; fileRef = B825FA151A4985C000FC4C0E /* JSJSON.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B825FA1C1A4985C000FC4C0E /* JSJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B825FA101A4985C000FC4C0E /* JSJSON.framework */; };
 		B826CD831A50BCEC00E9F7CE /* movies.json in Resources */ = {isa = PBXBuildFile; fileRef = B826CD821A50BCEC00E9F7CE /* movies.json */; };
@@ -20,7 +19,9 @@
 		B8DCE01F1B56C914004912D6 /* 1meg.json in Resources */ = {isa = PBXBuildFile; fileRef = B8DCE01C1B56C914004912D6 /* 1meg.json */; };
 		B8DCE0201B56C914004912D6 /* 10meg.json in Resources */ = {isa = PBXBuildFile; fileRef = B8DCE01D1B56C914004912D6 /* 10meg.json */; };
 		B8DCE0211B56C914004912D6 /* 30meg.json in Resources */ = {isa = PBXBuildFile; fileRef = B8DCE01E1B56C914004912D6 /* 30meg.json */; };
-		B8E21DCA1B4D5D210072D407 /* XCTAssertAdditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E21DC91B4D5D210072D407 /* XCTAssertAdditions.swift */; };
+		B8DCE0231B56CB30004912D6 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8DCE0221B56CB30004912D6 /* Utilities.swift */; };
+		B8DCE0241B56CC2B004912D6 /* SerializationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B809126A1B4C1147007ADEFF /* SerializationTests.swift */; };
+		B8E21DCA1B4D5D210072D407 /* SwiftAssert.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E21DC91B4D5D210072D407 /* SwiftAssert.swift */; };
 		B8EC4D3F1B51468C00AB15CC /* ParsingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B826CD861A5156B700E9F7CE /* ParsingTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -50,7 +51,8 @@
 		B8DCE01C1B56C914004912D6 /* 1meg.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 1meg.json; sourceTree = "<group>"; };
 		B8DCE01D1B56C914004912D6 /* 10meg.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 10meg.json; sourceTree = "<group>"; };
 		B8DCE01E1B56C914004912D6 /* 30meg.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 30meg.json; sourceTree = "<group>"; };
-		B8E21DC91B4D5D210072D407 /* XCTAssertAdditions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XCTAssertAdditions.swift; sourceTree = "<group>"; };
+		B8DCE0221B56CB30004912D6 /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
+		B8E21DC91B4D5D210072D407 /* SwiftAssert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftAssert.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,7 +115,8 @@
 			isa = PBXGroup;
 			children = (
 				B8A0E2661B52816700F006EB /* Resources */,
-				B8E21DC91B4D5D210072D407 /* XCTAssertAdditions.swift */,
+				B8E21DC91B4D5D210072D407 /* SwiftAssert.swift */,
+				B8DCE0221B56CB30004912D6 /* Utilities.swift */,
 				B809126A1B4C1147007ADEFF /* SerializationTests.swift */,
 				B826CD861A5156B700E9F7CE /* ParsingTests.swift */,
 				B825FA201A4985C000FC4C0E /* Supporting Files */,
@@ -267,11 +270,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B809126B1B4C1147007ADEFF /* SerializationTests.swift in Sources */,
+				B8DCE0231B56CB30004912D6 /* Utilities.swift in Sources */,
 				B89C9DF41B4AE5EA00765239 /* JSON.swift in Sources */,
 				B8EC4D3F1B51468C00AB15CC /* ParsingTests.swift in Sources */,
 				B8A685941B5032AE001FF943 /* JSONParser.swift in Sources */,
-				B8E21DCA1B4D5D210072D407 /* XCTAssertAdditions.swift in Sources */,
+				B8DCE0241B56CC2B004912D6 /* SerializationTests.swift in Sources */,
+				B8E21DCA1B4D5D210072D407 /* SwiftAssert.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

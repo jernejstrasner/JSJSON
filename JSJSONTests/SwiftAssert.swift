@@ -1,5 +1,5 @@
 //
-//  XCTAssertAdditions.swift
+//  SwiftAssert.swift
 //  JSJSON
 //
 //  Created by Jernej Strasner on 7/8/15.
@@ -26,20 +26,6 @@ func SWIFTAssertNoThrow<T>(@autoclosure expression: () throws -> T, _ message: S
         return nil
     }
 }
-
-//func XCTAssertThrowsSpecific<T>(@autoclosure expression: () throws -> T, _ type: ErrorType, _ message: String = "", file: String = __FILE__, line: UInt = __LINE__) {
-//    do {
-//        try expression()
-//        XCTFail("No error to catch! - \(message)", file: file, line: line)
-//    } catch type {
-//        print("Yay")
-//    } catch {
-//        XCTFail("Caught an error but it's not equal to \(type) - \(message)")
-//    }
-//}
-
-// TODO: XCTAssertThrowsSpecific
-// TODO: XCTAssertNoThrowSpecific
 
 func SWIFTAssertNoThrowEqual<T : Equatable>(@autoclosure expression1: () -> T, @autoclosure _ expression2: () throws -> T, _ message: String = "", file: String = __FILE__, line: UInt = __LINE__) {
     do {
