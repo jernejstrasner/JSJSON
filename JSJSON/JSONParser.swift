@@ -78,6 +78,28 @@ public enum TokenValue {
         default: return nil
         }
     }
+
+    var last: TokenValue? {
+        switch self {
+        case .A(let a): return a.last
+        default: return nil
+        }
+    }
+}
+
+extension TokenValue : CustomDebugStringConvertible {
+
+    public var debugDescription: String {
+        switch self {
+        case .Null: return "Null"
+        case .B(let b): return "Boolean(\(b))"
+        case .N(let n): return "Number(\(n))"
+        case .S(let s): return "String(\(s))"
+        case .A(let a): return "Array(\(a))"
+        case .O(let o): return "Object(\(o))"
+        }
+    }
+
 }
 
 struct Token {
@@ -230,9 +252,6 @@ public struct JSONParser {
             }
         }
 
-        var c = 0
-        tokens.items.map { print("\(c++) -> \($0)") }
-
         var stackLocation = 0
         if tokens.items.first?.kind == .ObjectStart {
             return try buildObject(&tokens, position: &stackLocation)
@@ -249,7 +268,6 @@ public struct JSONParser {
         while position < stack.items.count {
             // Key
             let keyToken = stack.items[position]
-            print("\(position) -> \(keyToken)")
             guard keyToken.kind == .String else {
                 throw Error.InvalidObject
             }
@@ -288,7 +306,6 @@ public struct JSONParser {
         while position < stack.items.count {
             // Element
             let elementToken = stack.items[position]
-            print("\(position) -> \(elementToken)")
             if elementToken.isValueType {
                 array.append(try elementToken.parseValue())
             } else if elementToken.kind == .ArrayStart {

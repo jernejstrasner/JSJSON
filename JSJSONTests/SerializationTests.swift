@@ -34,29 +34,29 @@ struct Person {
 class SerializationTests: XCTestCase {
 
     func testErrors() {
-        XCTAssertThrows(try toJSON(NSData()))
-        XCTAssertNoThrow(try toJSON(999))
+        SWIFTAssertThrows(try toJSON(NSData()))
+        SWIFTAssertNoThrow(try toJSON(999))
     }
 
     func testNumbers() {
-        XCTAssertNoThrowEqual("1", try toJSON(1))
-        XCTAssertNoThrowEqual("0", try toJSON(0))
-        XCTAssertNoThrowEqual("8.3", try toJSON(8.3))
-        XCTAssertNoThrowEqual("-772.1214842", try toJSON(-772.1214842))
-        XCTAssertNoThrowEqual("3", try toJSON(Int8(3)))
+        SWIFTAssertNoThrowEqual("1", try toJSON(1))
+        SWIFTAssertNoThrowEqual("0", try toJSON(0))
+        SWIFTAssertNoThrowEqual("8.3", try toJSON(8.3))
+        SWIFTAssertNoThrowEqual("-772.1214842", try toJSON(-772.1214842))
+        SWIFTAssertNoThrowEqual("3", try toJSON(Int8(3)))
     }
 
     func testString() {
-        XCTAssertNoThrowEqual("\"test\"", try toJSON("test"))
-        XCTAssertNoThrowEqual("\"emoji😄\"", try toJSON("emoji😄"))
+        SWIFTAssertNoThrowEqual("\"test\"", try toJSON("test"))
+        SWIFTAssertNoThrowEqual("\"emoji😄\"", try toJSON("emoji😄"))
     }
     
     func testArray() {
         let a = [0, 8, 2, 1, 9, 0]
-        XCTAssertNoThrowEqual("[0,8,2,1,9,0]", try a.toJSON())
+        SWIFTAssertNoThrowEqual("[0,8,2,1,9,0]", try a.toJSON())
 
         let b = [871.22, 9381.1123, -84812.1212, 2.398287733]
-        XCTAssertNoThrowEqual("[871.22,9381.1123,-84812.1212,2.398287733]", try b.toJSON())
+        SWIFTAssertNoThrowEqual("[871.22,9381.1123,-84812.1212,2.398287733]", try b.toJSON())
     }
 
     func testDictionary() {
@@ -73,19 +73,19 @@ class SerializationTests: XCTestCase {
             "{\"c\":813,\"b\":922,\"a\":9}",
             "{\"c\":813,\"a\":9,\"b\":922}",
         ]
-        XCTAssertNoThrowValidateValue(try a.toJSON()) { set.contains($0) }
+        SWIFTAssertNoThrowValidateValue(try a.toJSON()) { set.contains($0) }
     }
 
     func testStruct() {
         let a = Person(name: "John", age: 32, children: nil)
-        XCTAssertNoThrowEqual("{\"name\":\"John\",\"age\":32,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null}", try toJSON(a))
+        SWIFTAssertNoThrowEqual("{\"name\":\"John\",\"age\":32,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null}", try toJSON(a))
 
         let b = Person(name: "George", age: 43, children: [
             Person(name: "Ann", age: 12, children: nil),
             Person(name: "Matt", age: 18, children: nil)
             ]
         )
-        XCTAssertNoThrowEqual("{\"name\":\"George\",\"age\":43,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":[{\"name\":\"Ann\",\"age\":12,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null},{\"name\":\"Matt\",\"age\":18,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null}]}", try toJSON(b))
+        SWIFTAssertNoThrowEqual("{\"name\":\"George\",\"age\":43,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":[{\"name\":\"Ann\",\"age\":12,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null},{\"name\":\"Matt\",\"age\":18,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null}]}", try toJSON(b))
     }
 
 //    // Not supporting ObjC objects, here just for testing how much support we get for free

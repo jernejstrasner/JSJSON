@@ -8,19 +8,22 @@
 
 import XCTest
 
-func XCTAssertThrows<T>(@autoclosure expression: () throws -> T, _ message: String = "", file: String = __FILE__, line: UInt = __LINE__) {
+func SWIFTAssertThrows<T>(@autoclosure expression: () throws -> T, _ message: String = "", file: String = __FILE__, line: UInt = __LINE__) -> T? {
     do {
-        try expression()
+        let result = try expression()
         XCTFail("No error to catch! - \(message)", file: file, line: line)
+        return result
     } catch {
+        return nil
     }
 }
 
-func XCTAssertNoThrow<T>(@autoclosure expression: () throws -> T, _ message: String = "", file: String = __FILE__, line: UInt = __LINE__) {
+func SWIFTAssertNoThrow<T>(@autoclosure expression: () throws -> T, _ message: String = "", file: String = __FILE__, line: UInt = __LINE__) -> T? {
     do {
-        try expression()
+        return try expression()
     } catch let error {
         XCTFail("Caught error: \(error) - \(message)", file: file, line: line)
+        return nil
     }
 }
 
@@ -38,7 +41,7 @@ func XCTAssertNoThrow<T>(@autoclosure expression: () throws -> T, _ message: Str
 // TODO: XCTAssertThrowsSpecific
 // TODO: XCTAssertNoThrowSpecific
 
-func XCTAssertNoThrowEqual<T : Equatable>(@autoclosure expression1: () -> T, @autoclosure _ expression2: () throws -> T, _ message: String = "", file: String = __FILE__, line: UInt = __LINE__) {
+func SWIFTAssertNoThrowEqual<T : Equatable>(@autoclosure expression1: () -> T, @autoclosure _ expression2: () throws -> T, _ message: String = "", file: String = __FILE__, line: UInt = __LINE__) {
     do {
         let result2 = try expression2()
         XCTAssertEqual(expression1, result2, message, file: file, line: line)
@@ -47,11 +50,17 @@ func XCTAssertNoThrowEqual<T : Equatable>(@autoclosure expression1: () -> T, @au
     }
 }
 
-func XCTAssertNoThrowValidateValue<T>(@autoclosure expression: () throws -> T, _ message: String = "", file: String = __FILE__, line: UInt = __LINE__, _ validator: (T) -> Bool) {
+func SWIFTAssertNoThrowValidateValue<T>(@autoclosure expression: () throws -> T, _ message: String = "", file: String = __FILE__, line: UInt = __LINE__, _ validator: (T) -> Bool) {
     do {
         let result = try expression()
         XCTAssert(validator(result), "Value validation failed - \(message)", file: file, line: line)
     } catch let error {
         XCTFail("Caught error: \(error) - \(message)", file: file, line: line)
     }
+}
+
+func SWIFTAssertEqual<T: Equatable>(@autoclosure f: () -> T?, @autoclosure _ g: () -> T?, _ message: String = "", file: String = __FILE__, line: UInt = __LINE__) {
+    let resultF = f()
+    let resultG = g()
+    XCTAssert(resultF == resultG, "\"\(resultF)\" is not equal to \"\(resultG)\"")
 }

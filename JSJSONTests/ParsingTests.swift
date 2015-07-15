@@ -27,12 +27,15 @@ class ParsingTests: XCTestCase {
 
         let parser = JSONParser(jsonString)
         XCTAssert(parser != nil)
-        XCTAssertNoThrow(try parser!.parse())
+        let data = SWIFTAssertNoThrow(try parser!.parse())
+        XCTAssert(data != nil)
 
-//        // Check integrity
-//        if let a = json as? JArray {
-//            XCTAssert((a[0] as? JObject) != nil, "Not a valid title!")
-//        }
+        // Check some data integrity
+        if let data = data {
+            SWIFTAssertEqual(data[0]?["country"]?.string, "Francija")
+            SWIFTAssertEqual(data[2]?["duration"]?.number, 151)
+            SWIFTAssertEqual(data.last?["shows"]?.last?["showID"]?.string, "e810b3a91a07aab8ddf92c50c5c93fc541afcfdc6132ce66965d4ee231506a42")
+        }
     }
 
     func testCrazyParsing() {
@@ -40,21 +43,13 @@ class ParsingTests: XCTestCase {
         XCTAssert(jsonString.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0)
 
         // NSJSONSerialization is not able to parse this thing
-        var error: NSError?
-        let jsonObj: AnyObject?
-        do {
-            jsonObj = try NSJSONSerialization.JSONObjectWithData(jsonString.dataUsingEncoding(NSUTF8StringEncoding)!, options: [])
-        } catch let error1 as NSError {
-            error = error1
-            jsonObj = nil
-        }
-        XCTAssert(jsonObj == nil)
-        XCTAssert(error != nil)
+        SWIFTAssertThrows(try NSJSONSerialization.JSONObjectWithData(jsonString.dataUsingEncoding(NSUTF8StringEncoding)!, options: []))
 
         // We can!
         let parser = JSONParser(jsonString)
         XCTAssert(parser != nil)
-        XCTAssertNoThrow(try parser!.parse())
+        let data = SWIFTAssertNoThrow(try parser!.parse())
+        XCTAssert(data != nil)
     }
 
     func testCocoaSpeed() {
