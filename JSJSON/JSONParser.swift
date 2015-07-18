@@ -311,13 +311,13 @@ public struct JSONParser {
                 let c = json[++position]
                 switch c {
                 case 0x22, 0x2f, 0x5c, 0x62, 0x66, 0x72, 0x6e, 0x74:
-                    break;
+                    break
                 case 0x75:
                     // Check for valid hex characters
                     position++
                     for var i = 0; i < 4 && position < length; i++, position++ {
                         switch json[position] {
-                        case 0x30...0x39, 0x41...0x46, 0x61...0x66: continue
+                        case 0x30...0x39, 0x41...0x46, 0x61...0x66: break
                         default: throw Error.StringInvalidHexCharacter
                         }
                     }
@@ -330,13 +330,6 @@ public struct JSONParser {
         // Zero length string
         return Token(kind: .String, pointer: json+start, length: 0)
     }
-
-//    case 0x2d, 0x30...0x39, 0x74, 0x66, 0x6e: // -, 0-9, t, f, n
-
-//    case 0x6e:  value = "null"
-//    case 0x74:  value = true
-//    case 0x66:  value = false
-//    default:    value = convertToNumber(primitive)
 
     private func parsePrimitive(inout position: Int) throws -> Token {
         // Get the type
@@ -354,7 +347,7 @@ public struct JSONParser {
             case 0x9, 0x0d, 0x0a, 0x20, 0x2c, 0x7d, 0x5d:
                 return Token(kind: kind, pointer: json+start, length: (position--)-start)
             default:
-                continue
+                break
             }
         }
 
