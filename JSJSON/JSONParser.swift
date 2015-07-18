@@ -74,10 +74,10 @@ struct Token {
     }
 
     let kind: Kind
-    var pointer: UnsafePointer<Int8>
+    var pointer: UnsafePointer<UInt8>
     var length: Int
 
-    init(kind: Kind, pointer: UnsafePointer<Int8>, length: Int = 0) {
+    init(kind: Kind, pointer: UnsafePointer<UInt8>, length: Int = 0) {
         self.kind = kind
         self.pointer = pointer
         self.length = length
@@ -101,35 +101,12 @@ struct Token {
             default: throw JSONParser.Error.InvalidBoolean
             }
         case .Number:
-            var isFloatingPoint = false
-            var isNegative = false
-
-            // Check if we have a valid number and determine if it's a float and/or negative
-            for var i = 0; i < length; i++ {
-                switch pointer[i] {
-                case 0x2d where i == 0 || isFloatingPoint:
-                    isNegative = true
-                case 0x2e, 0x45, 0x65 where i > 0:
-                    isFloatingPoint = true
-                case 0x2b where i > 0:
-                    continue
-                case 0x30...0x39:
-                    continue
-                default:
-                    throw JSONParser.Error.InvalidNumber
-                }
-            }
-
-            // Parse the number
-            var number: Double
-            if isFloatingPoint {
-                number = strtod(pointer, nil)
-            } else {
-                if isNegative {
-                    number = Double(strtoll(pointer, nil, 10))
-                } else {
-                    number = Double(strtoull(pointer, nil, 10))
-                }
+            let signedPointer = unsafeBitCast(pointer, UnsafePointer<Int8>.self)
+            var endPointer: UnsafeMutablePointer<Int8> = nil
+            let number = strtod(signedPointer, &endPointer)
+            if signedPointer == endPointer || errno == ERANGE {
+                // No parsing done or under/over-flow
+                throw JSONParser.Error.InvalidNumber
             }
             return TokenValue.Number(number)
         case .String:
@@ -141,8 +118,14 @@ struct Token {
     }
 
     func buildString() throws -> String {
-        if let string = NSString(bytes: pointer, length: length, encoding: NSUTF8StringEncoding) as? String {
-            return string
+        let buffer = UnsafeMutablePointer<CChar>.alloc(length+1)
+        memcpy(buffer, pointer, length)
+        buffer[length] = 0
+        defer {
+            buffer.dealloc(length+1)
+        }
+        if let a = String.fromCString(buffer) {
+            return a
         }
         throw JSONParser.Error.InvalidString
     }
@@ -165,22 +148,22 @@ public struct JSONParser {
         case NotAValueType
     }
     
-    private let json: UnsafePointer<Int8>
+    private let json: UnsafePointer<UInt8>
     private let length: Int
 
     init?(_ s: String) {
         if let data = s.dataUsingEncoding(NSUTF8StringEncoding) {
-            self.init(bytes: UnsafePointer<Int8>(data.bytes), length: data.length)
+            self.init(bytes: UnsafePointer<UInt8>(data.bytes), length: data.length)
         } else {
             return nil
         }
     }
 
     init(_ data: NSData) {
-        self.init(bytes: UnsafePointer<Int8>(data.bytes), length: data.length)
+        self.init(bytes: UnsafePointer<UInt8>(data.bytes), length: data.length)
     }
 
-    init(bytes: UnsafePointer<Int8>, length: Int) {
+    init(bytes: UnsafePointer<UInt8>, length: Int) {
         self.json = bytes
         self.length = length
     }
