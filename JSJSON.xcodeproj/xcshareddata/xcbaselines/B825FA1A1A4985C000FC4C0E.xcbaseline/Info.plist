@@ -4,7 +4,7 @@
 <dict>
 	<key>runDestinationsByUUID</key>
 	<dict>
-		<key>8110FAE7-767D-45F2-910A-F69310147FCE</key>
+		<key>1FD1F4B6-D8BB-44D7-B709-DD5725807FAD</key>
 		<dict>
 			<key>localComputer</key>
 			<dict>
@@ -34,6 +34,11 @@
 				<key>platformIdentifier</key>
 				<string>com.apple.platform.iphonesimulator</string>
 			</dict>
+		</dict>
+		<key>79BE8658-A852-4885-87EA-FAA1A0C982E8</key>
+		<dict>
+			<key>targetArchitecture</key>
+			<string>x86_64</string>
 		</dict>
 	</dict>
 </dict>
