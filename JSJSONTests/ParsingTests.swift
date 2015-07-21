@@ -24,9 +24,7 @@ class ParsingTests: XCTestCase {
         XCTAssert(jsonObj != nil)
         XCTAssert(error == nil)
 
-        let parser = JSONParser(jsonString)
-        XCTAssert(parser != nil)
-        let data = SWIFTAssertNoThrow(try parser!.parse())
+        let data = SWIFTAssertNoThrow(try JSONParser.parse(jsonString))
         XCTAssert(data != nil)
 
         // Check some data integrity
@@ -44,9 +42,7 @@ class ParsingTests: XCTestCase {
         SWIFTAssertThrows(try NSJSONSerialization.JSONObjectWithData(jsonString.dataUsingEncoding(NSUTF8StringEncoding)!, options: []))
 
         // We can!
-        let parser = JSONParser(jsonString)
-        XCTAssert(parser != nil)
-        let data = SWIFTAssertNoThrow(try parser!.parse())
+        let data = SWIFTAssertNoThrow(try JSONParser.parse(jsonString))
         XCTAssert(data != nil)
     }
 
@@ -54,9 +50,7 @@ class ParsingTests: XCTestCase {
         let jsonString = SWIFTAssertNoThrow(try loadJSON("citylots"))!
 
         // Test our parser
-        let parser = JSONParser(jsonString)
-        XCTAssert(parser != nil)
-        let data = SWIFTAssertNoThrow(try parser!.parse())
+        let data = SWIFTAssertNoThrow(try JSONParser.parse(jsonString))
         XCTAssert(data != nil)
     }
 
@@ -75,13 +69,13 @@ class ParsingTests: XCTestCase {
 
         measureBlock {
             do {
-                try JSONParser(jsonString)!.parse()
+                try JSONParser.parse(jsonString)
             } catch {}
         }
     }
 
     func testBigSpeedCocoa() {
-        let jsonString = SWIFTAssertNoThrow(try loadJSON("10meg"))!
+        let jsonString = SWIFTAssertNoThrow(try loadJSON("1meg"))!
 
         measureBlock {
             do {
@@ -91,11 +85,11 @@ class ParsingTests: XCTestCase {
     }
 
     func testBigSpeed() {
-        let jsonString = SWIFTAssertNoThrow(try loadJSON("10meg"))!
+        let jsonString = SWIFTAssertNoThrow(try loadJSON("1meg"))!
 
         measureBlock {
             do {
-                try JSONParser(jsonString)!.parse()
+                try JSONParser.parse(jsonString)
             } catch {}
         }
     }

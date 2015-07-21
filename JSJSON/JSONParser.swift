@@ -8,130 +8,6 @@
 
 import Foundation
 
-public enum TokenValue {
-    case Null
-    case Number(Double)
-    case Text(String)
-    case Boolean(Bool)
-    case Array([TokenValue])
-    case Object([String:TokenValue])
-
-    var isNull: Bool {
-        if case .Null = self { return true }
-        return false
-    }
-
-    var string: String? {
-        if case .Text(let text) = self { return text }
-        return nil
-    }
-
-    var number: Double? {
-        if case .Number(let number) = self { return number }
-        return nil
-    }
-
-    var bool: Bool? {
-        if case .Boolean(let boolean) = self { return boolean }
-        return nil
-    }
-
-    subscript(index: Int) -> TokenValue? {
-        if case .Array(let array) = self where array.count > index { return array[index] }
-        return nil
-    }
-
-    subscript(key: String) -> TokenValue? {
-        if case .Object(let object) = self { return object[key] }
-        return nil
-    }
-
-    var last: TokenValue? {
-        if case .Array(let array) = self { return array.last }
-        return nil
-    }
-}
-
-extension TokenValue : CustomDebugStringConvertible {
-
-    public var debugDescription: String {
-        switch self {
-        case .Null: return "Null"
-        case .Boolean(let b): return "Boolean(\(b))"
-        case .Number(let n): return "Number(\(n))"
-        case .Text(let s): return "Text(\(s))"
-        case .Array(let a): return "Array(\(a))"
-        case .Object(let o): return "Object(\(o))"
-        }
-    }
-
-}
-
-struct Token {
-
-    enum Kind {
-        case ObjectStart, ArrayStart, Null, Boolean, Number, String, Colon, Comma, ObjectEnd, ArrayEnd
-    }
-
-    let kind: Kind
-    var pointer: UnsafePointer<UInt8>
-    var length: Int
-
-    init(kind: Kind, pointer: UnsafePointer<UInt8>, length: Int = 0) {
-        self.kind = kind
-        self.pointer = pointer
-        self.length = length
-    }
-
-    var isValueType: Bool {
-        switch kind {
-        case .Null, .Boolean, .Number, .String: return true
-        default: return false
-        }
-    }
-
-    func parseValue() throws -> TokenValue {
-        switch kind {
-        case .Null:
-            return TokenValue.Null
-        case .Boolean:
-            switch pointer[0] {
-            case 0x74: return TokenValue.Boolean(true)
-            case 0x66: return TokenValue.Boolean(false)
-            default: throw JSONParser.Error.InvalidBoolean
-            }
-        case .Number:
-            let signedPointer = unsafeBitCast(pointer, UnsafePointer<Int8>.self)
-            var endPointer: UnsafeMutablePointer<Int8> = nil
-            let number = strtod(signedPointer, &endPointer)
-            if signedPointer == endPointer || errno == ERANGE {
-                // No parsing done or under/over-flow
-                throw JSONParser.Error.InvalidNumber
-            }
-            return TokenValue.Number(number)
-        case .String:
-            let string = try buildString()
-            return TokenValue.Text(string)
-        default:
-            throw JSONParser.Error.NotAValueType
-        }
-    }
-
-    func buildString() throws -> String {
-        let buffer = UnsafeMutablePointer<CChar>.alloc(length+1)
-        memcpy(buffer, pointer, length)
-        buffer[length] = 0
-        defer {
-            buffer.dealloc(length+1)
-        }
-        if let a = String.fromCString(buffer) {
-            return a
-        }
-        throw JSONParser.Error.InvalidString
-    }
-
-}
-
 public struct JSONParser {
 
     enum Error : ErrorType {
@@ -146,54 +22,154 @@ public struct JSONParser {
         case InvalidArray
         case UnexpectedRootNodeType
         case NotAValueType
+        case InvalidInputString
     }
     
-    private let json: UnsafePointer<UInt8>
-    private let length: Int
+    struct Token {
 
-    init?(_ s: String) {
-        if let data = s.dataUsingEncoding(NSUTF8StringEncoding) {
-            self.init(bytes: UnsafePointer<UInt8>(data.bytes), length: data.length)
-        } else {
+        enum Kind {
+            case ObjectStart, ArrayStart, Null, Boolean, Number, String, Colon, Comma, ObjectEnd, ArrayEnd
+        }
+
+        let kind: Kind
+        var pointer: UnsafePointer<Int8>
+        var length: Int
+
+        init(kind: Kind, pointer: UnsafePointer<Int8>, length: Int = 0) {
+            self.kind = kind
+            self.pointer = pointer
+            self.length = length
+        }
+
+        var isValueType: Bool {
+            switch kind {
+            case .Null, .Boolean, .Number, .String: return true
+            default: return false
+            }
+        }
+
+        func parseValue() throws -> TokenValue {
+            switch kind {
+            case .Null:
+                return TokenValue.Null
+            case .Boolean:
+                switch pointer[0] {
+                case 0x74: return TokenValue.Boolean(true)
+                case 0x66: return TokenValue.Boolean(false)
+                default: throw Error.InvalidBoolean
+                }
+            case .Number:
+                var endPointer: UnsafeMutablePointer<Int8> = nil
+                let number = strtod(pointer, &endPointer)
+                if pointer == endPointer || errno == ERANGE {
+                    // No parsing done or under/over-flow
+                    throw Error.InvalidNumber
+                }
+                return TokenValue.Number(number)
+            case .String:
+                let string = try buildString()
+                return TokenValue.Text(string)
+            default:
+                throw Error.NotAValueType
+            }
+        }
+
+        func buildString() throws -> String {
+            let buffer = UnsafeMutablePointer<CChar>.alloc(length+1)
+            memcpy(buffer, pointer, length)
+            buffer[length] = 0
+            defer {
+                buffer.dealloc(length+1)
+            }
+            if let a = String.fromCString(buffer) {
+                return a
+            }
+            throw Error.InvalidString
+        }
+        
+    }
+    
+    enum TokenValue {
+        case Null
+        case Number(Double)
+        case Text(String)
+        case Boolean(Bool)
+        case Array([TokenValue])
+        case Object([String:TokenValue])
+
+        var isNull: Bool {
+            if case .Null = self { return true }
+            return false
+        }
+
+        var string: String? {
+            if case .Text(let text) = self { return text }
+            return nil
+        }
+
+        var number: Double? {
+            if case .Number(let number) = self { return number }
+            return nil
+        }
+
+        var bool: Bool? {
+            if case .Boolean(let boolean) = self { return boolean }
+            return nil
+        }
+
+        subscript(index: Int) -> TokenValue? {
+            if case .Array(let array) = self where array.count > index { return array[index] }
+            return nil
+        }
+
+        subscript(key: String) -> TokenValue? {
+            if case .Object(let object) = self { return object[key] }
+            return nil
+        }
+        
+        var last: TokenValue? {
+            if case .Array(let array) = self { return array.last }
             return nil
         }
     }
 
-    init(_ data: NSData) {
-        self.init(bytes: UnsafePointer<UInt8>(data.bytes), length: data.length)
+    static func parse(string: String) throws -> TokenValue {
+        if let data = string.dataUsingEncoding(NSUTF8StringEncoding) {
+            return try parse(UnsafePointer<Int8>(data.bytes), length: data.length)
+        }
+        throw Error.InvalidInputString
     }
 
-    init(bytes: UnsafePointer<UInt8>, length: Int) {
-        self.json = bytes
-        self.length = length
+    static func parse(buffer: UnsafeBufferPointer<Int8>) throws -> TokenValue {
+        return try parse(buffer.baseAddress, length: buffer.count)
     }
 
-    func parse() throws -> TokenValue {
+    static func parse(pointer: UnsafePointer<Int8>, length: Int) throws -> TokenValue {
         var tokens = Array<Token>()
         var position = 0
         for ; position < length; position++ {
-            let c = json[position]
+            let c = pointer[position]
             switch c {
             case 0x7b: // {
-                tokens.append(Token(kind: .ObjectStart, pointer: json + position, length: 1))
+                tokens.append(Token(kind: .ObjectStart, pointer: pointer + position, length: 1))
             case 0x5b: // [
-                tokens.append(Token(kind: .ArrayStart, pointer: json + position, length: 1))
+                tokens.append(Token(kind: .ArrayStart, pointer: pointer + position, length: 1))
             case 0x5d: // ]
-                tokens.append(Token(kind: .ArrayEnd, pointer: json + position, length: 1))
+                tokens.append(Token(kind: .ArrayEnd, pointer: pointer + position, length: 1))
             case 0x7d: // }
-                tokens.append(Token(kind: .ObjectEnd, pointer: json + position, length: 1))
+                tokens.append(Token(kind: .ObjectEnd, pointer: pointer + position, length: 1))
             case 0x9, 0x0d, 0x0a, 0x20: // \t, \r, \n, (space)
                 // Blank space
                 break
             case 0x22: // "
-                let token = try parseString(&position)
+                let token = try parseString(pointer, length: length, position: &position)
                 tokens.append(token)
             case 0x3a: // :
-                tokens.append(Token(kind: .Colon, pointer: json + position, length: 1))
+                tokens.append(Token(kind: .Colon, pointer: pointer + position, length: 1))
             case 0x2c: // ,
-                tokens.append(Token(kind: .Comma, pointer: json + position, length: 1))
+                tokens.append(Token(kind: .Comma, pointer: pointer + position, length: 1))
             case 0x2d, 0x30...0x39, 0x74, 0x66, 0x6e: // -, 0-9, t, f, n
-                let token = try parsePrimitive(&position)
+                let token = try parsePrimitive(pointer, length: length, position: &position)
                 tokens.append(token)
             default:
                 throw Error.UnexpectedCharacter
@@ -210,7 +186,7 @@ public struct JSONParser {
         }
     }
 
-    private func buildObject(inout tokens: Array<Token>, inout position: Int) throws -> TokenValue {
+    private static func buildObject(inout tokens: Array<Token>, inout position: Int) throws -> TokenValue {
         var object = [String:TokenValue]()
         position++ // Skip ObjectStart
         while position < tokens.count {
@@ -248,7 +224,7 @@ public struct JSONParser {
         throw Error.InvalidObject
     }
 
-    private func buildArray(inout tokens: Array<Token>, inout position: Int) throws -> TokenValue {
+    private static func buildArray(inout tokens: Array<Token>, inout position: Int) throws -> TokenValue {
         var array = [TokenValue]()
         position++ // Skip ArrayStart
         while position < tokens.count {
@@ -276,7 +252,7 @@ public struct JSONParser {
         throw Error.InvalidArray
     }
 
-    private func parseString(inout position: Int) throws -> Token {
+    private static func parseString(json: UnsafePointer<Int8>, length: Int, inout position: Int) throws -> Token {
         // Skip the opening "
         position++
         let start = position
@@ -314,7 +290,7 @@ public struct JSONParser {
         return Token(kind: .String, pointer: json+start, length: 0)
     }
 
-    private func parsePrimitive(inout position: Int) throws -> Token {
+    private static func parsePrimitive(json: UnsafePointer<Int8>, length: Int, inout position: Int) throws -> Token {
         // Get the type
         var kind: Token.Kind
         switch json[position] {
@@ -338,4 +314,21 @@ public struct JSONParser {
         throw Error.InvalidPrimitive
     }
 
+}
+
+// MARK: Debugging extensions
+
+extension JSONParser.TokenValue : CustomDebugStringConvertible {
+
+    var debugDescription: String {
+        switch self {
+        case .Null: return "Null"
+        case .Boolean(let b): return "Boolean(\(b))"
+        case .Number(let n): return "Number(\(n))"
+        case .Text(let s): return "Text(\(s))"
+        case .Array(let a): return "Array(\(a))"
+        case .Object(let o): return "Object(\(o))"
+        }
+    }
+    
 }
