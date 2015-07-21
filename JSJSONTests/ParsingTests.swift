@@ -1,5 +1,5 @@
 //
-//  JSONParserTests.swift
+//  JSONTests.swift
 //  JSJSON
 //
 //  Created by Jernej Strasner on 12/29/14.
@@ -24,7 +24,7 @@ class ParsingTests: XCTestCase {
         XCTAssert(jsonObj != nil)
         XCTAssert(error == nil)
 
-        let data = SWIFTAssertNoThrow(try JSONParser.parse(jsonString))
+        let data = SWIFTAssertNoThrow(try JSON.parse(jsonString))
         XCTAssert(data != nil)
 
         // Check some data integrity
@@ -42,7 +42,7 @@ class ParsingTests: XCTestCase {
         SWIFTAssertThrows(try NSJSONSerialization.JSONObjectWithData(jsonString.dataUsingEncoding(NSUTF8StringEncoding)!, options: []))
 
         // We can!
-        let data = SWIFTAssertNoThrow(try JSONParser.parse(jsonString))
+        let data = SWIFTAssertNoThrow(try JSON.parse(jsonString))
         XCTAssert(data != nil)
     }
 
@@ -50,7 +50,7 @@ class ParsingTests: XCTestCase {
         let jsonString = SWIFTAssertNoThrow(try loadJSON("citylots"))!
 
         // Test our parser
-        let data = SWIFTAssertNoThrow(try JSONParser.parse(jsonString))
+        let data = SWIFTAssertNoThrow(try JSON.parse(jsonString))
         XCTAssert(data != nil)
     }
 
@@ -69,7 +69,7 @@ class ParsingTests: XCTestCase {
 
         measureBlock {
             do {
-                try JSONParser.parse(jsonString)
+                try JSON.parse(jsonString)
             } catch {}
         }
     }
@@ -89,7 +89,7 @@ class ParsingTests: XCTestCase {
 
         measureBlock {
             do {
-                try JSONParser.parse(jsonString)
+                try JSON.parse(jsonString)
             } catch {}
         }
     }

@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct JSONParser {
+public struct JSON {
 
     enum Error : ErrorType {
         case StringInvalidHexCharacter
@@ -25,7 +25,7 @@ public struct JSONParser {
         case InvalidInputString
     }
     
-    struct Token {
+    private struct Token {
 
         enum Kind {
             case ObjectStart, ArrayStart, Null, Boolean, Number, String, Colon, Comma, ObjectEnd, ArrayEnd
@@ -48,14 +48,14 @@ public struct JSONParser {
             }
         }
 
-        func parseValue() throws -> TokenValue {
+        func parseValue() throws -> Value {
             switch kind {
             case .Null:
-                return TokenValue.Null
+                return Value.Null
             case .Boolean:
                 switch pointer[0] {
-                case 0x74: return TokenValue.Boolean(true)
-                case 0x66: return TokenValue.Boolean(false)
+                case 0x74: return Value.Boolean(true)
+                case 0x66: return Value.Boolean(false)
                 default: throw Error.InvalidBoolean
                 }
             case .Number:
@@ -65,10 +65,10 @@ public struct JSONParser {
                     // No parsing done or under/over-flow
                     throw Error.InvalidNumber
                 }
-                return TokenValue.Number(number)
+                return Value.Number(number)
             case .String:
                 let string = try buildString()
-                return TokenValue.Text(string)
+                return Value.Text(string)
             default:
                 throw Error.NotAValueType
             }
@@ -89,13 +89,13 @@ public struct JSONParser {
         
     }
     
-    enum TokenValue {
+    enum Value {
         case Null
         case Number(Double)
         case Text(String)
         case Boolean(Bool)
-        case Array([TokenValue])
-        case Object([String:TokenValue])
+        case Array([Value])
+        case Object([String:Value])
 
         var isNull: Bool {
             if case .Null = self { return true }
@@ -117,34 +117,34 @@ public struct JSONParser {
             return nil
         }
 
-        subscript(index: Int) -> TokenValue? {
+        subscript(index: Int) -> Value? {
             if case .Array(let array) = self where array.count > index { return array[index] }
             return nil
         }
 
-        subscript(key: String) -> TokenValue? {
+        subscript(key: String) -> Value? {
             if case .Object(let object) = self { return object[key] }
             return nil
         }
         
-        var last: TokenValue? {
+        var last: Value? {
             if case .Array(let array) = self { return array.last }
             return nil
         }
     }
 
-    static func parse(string: String) throws -> TokenValue {
+    static func parse(string: String) throws -> Value {
         if let data = string.dataUsingEncoding(NSUTF8StringEncoding) {
             return try parse(UnsafePointer<Int8>(data.bytes), length: data.length)
         }
         throw Error.InvalidInputString
     }
 
-    static func parse(buffer: UnsafeBufferPointer<Int8>) throws -> TokenValue {
+    static func parse(buffer: UnsafeBufferPointer<Int8>) throws -> Value {
         return try parse(buffer.baseAddress, length: buffer.count)
     }
 
-    static func parse(pointer: UnsafePointer<Int8>, length: Int) throws -> TokenValue {
+    static func parse(pointer: UnsafePointer<Int8>, length: Int) throws -> Value {
         var tokens = Array<Token>()
         var position = 0
         for ; position < length; position++ {
@@ -186,8 +186,8 @@ public struct JSONParser {
         }
     }
 
-    private static func buildObject(inout tokens: Array<Token>, inout position: Int) throws -> TokenValue {
-        var object = [String:TokenValue]()
+    private static func buildObject(inout tokens: Array<Token>, inout position: Int) throws -> Value {
+        var object = [String:Value]()
         position++ // Skip ObjectStart
         while position < tokens.count {
             // Key
@@ -214,7 +214,7 @@ public struct JSONParser {
             // ObjectEnd or Comma
             let lastToken = tokens[++position]
             switch lastToken.kind {
-            case .ObjectEnd: return TokenValue.Object(object)
+            case .ObjectEnd: return Value.Object(object)
             case .Comma: break
             default: throw Error.InvalidObject
             }
@@ -224,8 +224,8 @@ public struct JSONParser {
         throw Error.InvalidObject
     }
 
-    private static func buildArray(inout tokens: Array<Token>, inout position: Int) throws -> TokenValue {
-        var array = [TokenValue]()
+    private static func buildArray(inout tokens: Array<Token>, inout position: Int) throws -> Value {
+        var array = [Value]()
         position++ // Skip ArrayStart
         while position < tokens.count {
             // Element
@@ -242,7 +242,7 @@ public struct JSONParser {
             // ArrayEnd or Comma
             let lastToken = tokens[++position]
             switch lastToken.kind {
-            case .ArrayEnd: return TokenValue.Array(array)
+            case .ArrayEnd: return Value.Array(array)
             case .Comma: break
             default: throw Error.InvalidArray
             }
@@ -318,7 +318,7 @@ public struct JSONParser {
 
 // MARK: Debugging extensions
 
-extension JSONParser.TokenValue : CustomDebugStringConvertible {
+extension JSON.Value : CustomDebugStringConvertible {
 
     var debugDescription: String {
         switch self {
