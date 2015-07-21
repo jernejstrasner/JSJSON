@@ -7,8 +7,9 @@
 //
 
 import XCTest
+@testable import JSON
 
-struct Person {
+struct Person: JSONEncodable {
     var name: String
     var age: Int
     let factor = 99.1
@@ -78,14 +79,14 @@ class SerializationTests: XCTestCase {
 
     func testStruct() {
         let a = Person(name: "John", age: 32, children: nil)
-        SWIFTAssertNoThrowEqual("{\"name\":\"John\",\"age\":32,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null}", try toJSON(a))
+        SWIFTAssertNoThrowEqual("{\"name\":\"John\",\"age\":32,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null}", try a.toJSON())
 
         let b = Person(name: "George", age: 43, children: [
             Person(name: "Ann", age: 12, children: nil),
             Person(name: "Matt", age: 18, children: nil)
             ]
         )
-        SWIFTAssertNoThrowEqual("{\"name\":\"George\",\"age\":43,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":[{\"name\":\"Ann\",\"age\":12,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null},{\"name\":\"Matt\",\"age\":18,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null}]}", try toJSON(b))
+        SWIFTAssertNoThrowEqual("{\"name\":\"George\",\"age\":43,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":[{\"name\":\"Ann\",\"age\":12,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null},{\"name\":\"Matt\",\"age\":18,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null}]}", try b.toJSON())
     }
 
 //    // Not supporting ObjC objects, here just for testing how much support we get for free
