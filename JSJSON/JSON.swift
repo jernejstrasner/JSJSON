@@ -21,7 +21,7 @@ public protocol JSONEncodable {}
 extension JSONEncodable {
 
     public func toJSON() throws -> String {
-        return try reflect(self).extract()
+        return try _reflect(self).extract()
     }
 
 }
@@ -32,7 +32,7 @@ extension String : JSON_String {}
 extension Array where Element: JSONEncodable {
 
     public func toJSON() throws -> String {
-        return try reflect(self).extract()
+        return try _reflect(self).extract()
     }
 
 }
@@ -40,7 +40,7 @@ extension Array where Element: JSONEncodable {
 extension Dictionary where Key: JSON_String, Value: JSONEncodable {
 
     public func toJSON() throws -> String {
-        return try reflect(self).extract()
+        return try _reflect(self).extract()
     }
 
 }
@@ -63,15 +63,15 @@ extension Double: JSONEncodable {}
     Internal method whose sole purpose is testing.
 */
 internal func toJSON<T>(x: T) throws -> String {
-    return try reflect(x).extract()
+    return try _reflect(x).extract()
 }
 
 /**
     Internal extension of MirrorType which does all the serialization work using Swift's limited introspection capabilities.
 */
-private extension MirrorType {
+private extension _MirrorType {
 
-    func mapChildren<T>(@noescape transform: (String, MirrorType) throws -> T) throws -> [T] {
+    func mapChildren<T>(@noescape transform: (String, _MirrorType) throws -> T) throws -> [T] {
         var array = [T]()
         for i in 0..<self.count {
             try array.append(transform(self[i]))
@@ -97,7 +97,8 @@ private extension MirrorType {
             }
             return "{" + ",".join(array) + "}"
         case .Struct:
-            return "{" + ",".join(try self.mapChildren({ try "\""+$0.0+"\":"+$1.extract() })) + "}"
+            let mappedChildren = try self.mapChildren { try "\""+$0+"\":"+$1.extract() }
+            return "{" + ",".join(mappedChildren) + "}"
         default:
             switch self.value {
             case is Int, is Int8, is Int16, is Int32, is Int64, is UInt, is UInt8, is UInt16, is UInt32, is UInt64, is Float, is Double:
