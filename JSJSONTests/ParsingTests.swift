@@ -47,14 +47,6 @@ class ParsingTests: XCTestCase {
         XCTAssert(data != nil)
     }
 
-    func testBigParsing() {
-        let jsonString = SWIFTAssertNoThrow(try loadJSON("citylots"))!
-
-        // Test our parser
-        let data = SWIFTAssertNoThrow(try JSON.parse(jsonString))
-        XCTAssert(data != nil)
-    }
-
     func testCocoaSpeed() {
         let jsonString = SWIFTAssertNoThrow(try loadJSON("movies"))!
 
