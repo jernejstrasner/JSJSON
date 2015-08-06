@@ -40,24 +40,25 @@ class SerializationTests: XCTestCase {
     }
 
     func testNumbers() {
-        SWIFTAssertNoThrowEqual("1", try toJSON(1))
-        SWIFTAssertNoThrowEqual("0", try toJSON(0))
-        SWIFTAssertNoThrowEqual("8.3", try toJSON(8.3))
-        SWIFTAssertNoThrowEqual("-772.1214842", try toJSON(-772.1214842))
-        SWIFTAssertNoThrowEqual("3", try toJSON(Int8(3)))
+        SWIFTAssertNoThrowValidateValue(try toJSON(1)) { $0 == "1" }
+        SWIFTAssertNoThrowValidateValue(try toJSON(1)) { $0 == "1" }
+        SWIFTAssertNoThrowValidateValue(try toJSON(0)) { $0 == "0" }
+        SWIFTAssertNoThrowValidateValue(try toJSON(8.3)) { $0 == "8.3" }
+        SWIFTAssertNoThrowValidateValue(try toJSON(-772.1214842)) { $0 == "-772.1214842" }
+        SWIFTAssertNoThrowValidateValue(try toJSON(Int8(3))) { $0 == "3" }
     }
 
     func testString() {
-        SWIFTAssertNoThrowEqual("\"test\"", try toJSON("test"))
-        SWIFTAssertNoThrowEqual("\"emoji😄\"", try toJSON("emoji😄"))
+        SWIFTAssertNoThrowValidateValue(try toJSON("test")) { $0 == "\"test\"" }
+        SWIFTAssertNoThrowValidateValue(try toJSON("emoji😄")) { $0 == "\"emoji😄\"" }
     }
     
     func testArray() {
         let a = [0, 8, 2, 1, 9, 0]
-        SWIFTAssertNoThrowEqual("[0,8,2,1,9,0]", try a.toJSON())
+        SWIFTAssertNoThrowValidateValue(try a.toJSON()) { $0 == "[0,8,2,1,9,0]" }
 
         let b = [871.22, 9381.1123, -84812.1212, 2.398287733]
-        SWIFTAssertNoThrowEqual("[871.22,9381.1123,-84812.1212,2.398287733]", try b.toJSON())
+        SWIFTAssertNoThrowValidateValue(try b.toJSON()) { $0 == "[871.22,9381.1123,-84812.1212,2.398287733]" }
     }
 
     func testDictionary() {
@@ -79,14 +80,14 @@ class SerializationTests: XCTestCase {
 
     func testStruct() {
         let a = Person(name: "John", age: 32, children: nil)
-        SWIFTAssertNoThrowEqual("{\"name\":\"John\",\"age\":32,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null}", try a.toJSON())
+        SWIFTAssertNoThrowValidateValue(try a.toJSON()) { $0 == "{\"name\":\"John\",\"age\":32,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null}" }
 
         let b = Person(name: "George", age: 43, children: [
             Person(name: "Ann", age: 12, children: nil),
             Person(name: "Matt", age: 18, children: nil)
             ]
         )
-        SWIFTAssertNoThrowEqual("{\"name\":\"George\",\"age\":43,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":[{\"name\":\"Ann\",\"age\":12,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null},{\"name\":\"Matt\",\"age\":18,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null}]}", try b.toJSON())
+        SWIFTAssertNoThrowValidateValue(try b.toJSON()) { $0 == "{\"name\":\"George\",\"age\":43,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":[{\"name\":\"Ann\",\"age\":12,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null},{\"name\":\"Matt\",\"age\":18,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null}]}" }
     }
 
 //    // Not supporting ObjC objects, here just for testing how much support we get for free

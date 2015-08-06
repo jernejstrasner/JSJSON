@@ -21,7 +21,7 @@ public protocol JSONEncodable {}
 extension JSONEncodable {
 
     public func toJSON() throws -> String {
-        return try _reflect(self).extract()
+        return try _reflect(self).toJSON()
     }
 
 }
@@ -32,7 +32,7 @@ extension String : JSON_String {}
 extension Array where Element: JSONEncodable {
 
     public func toJSON() throws -> String {
-        return try _reflect(self).extract()
+        return try _reflect(self).toJSON()
     }
 
 }
@@ -40,7 +40,7 @@ extension Array where Element: JSONEncodable {
 extension Dictionary where Key: JSON_String, Value: JSONEncodable {
 
     public func toJSON() throws -> String {
-        return try _reflect(self).extract()
+        return try _reflect(self).toJSON()
     }
 
 }
@@ -63,7 +63,7 @@ extension Double: JSONEncodable {}
     Internal method whose sole purpose is testing.
 */
 internal func toJSON<T>(x: T) throws -> String {
-    return try _reflect(x).extract()
+    return try _reflect(x).toJSON()
 }
 
 /**
@@ -79,25 +79,25 @@ private extension _MirrorType {
         return array
     }
 
-    func extract() throws -> String {
+    func toJSON() throws -> String {
         switch self.disposition {
         case .Optional:
             guard self.count > 0 else {
                 return "null"
             }
-            return try self[0].1.extract()
+            return try self[0].1.toJSON()
         case .IndexContainer:
-            return "[" + ",".join(try self.mapChildren{ try $1.extract() }) + "]"
+            return "[" + ",".join(try self.mapChildren{ try $1.toJSON() }) + "]"
         case .KeyContainer:
             let array = try self.mapChildren { name, el -> String in
                 guard let key = el[0].1.value as? String where el.disposition == .Tuple && el.count == 2 else {
                     throw SerializationError.TypeNotSupported(self.valueType)
                 }
-                return try "\""+key+"\":"+el[1].1.extract()
+                return try "\""+key+"\":"+el[1].1.toJSON()
             }
             return "{" + ",".join(array) + "}"
         case .Struct:
-            let mappedChildren = try self.mapChildren { try "\""+$0+"\":"+$1.extract() }
+            let mappedChildren = try self.mapChildren { try "\""+$0+"\":"+$1.toJSON() }
             return "{" + ",".join(mappedChildren) + "}"
         default:
             switch self.value {
@@ -165,7 +165,7 @@ internal struct Token {
         case .Number:
             var endPointer: UnsafeMutablePointer<Int8> = nil
             let number = strtod(pointer, &endPointer)
-            if pointer == endPointer || errno == ERANGE {
+            if pointer == UnsafePointer(endPointer) || errno == ERANGE {
                 // No parsing done or under/over-flow
                 throw ParsingError.InvalidNumber
             }

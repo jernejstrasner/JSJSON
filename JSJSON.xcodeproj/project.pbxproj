@@ -16,7 +16,7 @@
 		B8DCE0231B56CB30004912D6 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8DCE0221B56CB30004912D6 /* Utilities.swift */; };
 		B8DCE0241B56CC2B004912D6 /* SerializationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B809126A1B4C1147007ADEFF /* SerializationTests.swift */; };
 		B8E21DCA1B4D5D210072D407 /* SwiftAssert.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E21DC91B4D5D210072D407 /* SwiftAssert.swift */; };
-		B8EC4D3F1B51468C00AB15CC /* ParsingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B826CD861A5156B700E9F7CE /* ParsingTests.swift */; };
+		B8F195841B740CA800B6C89D /* ParsingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B826CD861A5156B700E9F7CE /* ParsingTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -252,8 +252,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B8F195841B740CA800B6C89D /* ParsingTests.swift in Sources */,
 				B8DCE0231B56CB30004912D6 /* Utilities.swift in Sources */,
-				B8EC4D3F1B51468C00AB15CC /* ParsingTests.swift in Sources */,
 				B8DCE0241B56CC2B004912D6 /* SerializationTests.swift in Sources */,
 				B8E21DCA1B4D5D210072D407 /* SwiftAssert.swift in Sources */,
 			);
