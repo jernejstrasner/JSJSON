@@ -27,15 +27,15 @@ func SWIFTAssertNoThrow<T>(@autoclosure expression: () throws -> T, _ message: S
     }
 }
 
-// Seems to crash the compiler in Xcode 7 beta 5
-//func SWIFTAssertNoThrowEqual<T : Equatable>(@autoclosure expression1: () -> T, @autoclosure _ expression2: () throws -> T, _ message: String = "", file: String = __FILE__, line: UInt = __LINE__) {
-//    do {
-//        let result2 = try expression2()
-//        XCTAssertEqual(expression1, result2, message, file: file, line: line)
-//    } catch let error {
-//        XCTFail("Caught error: \(error) - \(message)", file: file, line: line)
-//    }
-//}
+func SWIFTAssertNoThrowEqual<T : Equatable>(@autoclosure expression1: () -> T, @autoclosure _ expression2: () throws -> T, _ message: String = "", file: String = __FILE__, line: UInt = __LINE__) {
+    do {
+        let result1 = expression1()
+        let result2 = try expression2()
+        XCTAssert(result1 == result2, "\"\(result1)\" is not equal to \"\(result2)\" - \(message)")
+    } catch let error {
+        XCTFail("Caught error: \(error) - \(message)", file: file, line: line)
+    }
+}
 
 func SWIFTAssertNoThrowValidateValue<T>(@autoclosure expression: () throws -> T, _ message: String = "", file: String = __FILE__, line: UInt = __LINE__, _ validator: (T) -> Bool) {
     do {
@@ -49,5 +49,5 @@ func SWIFTAssertNoThrowValidateValue<T>(@autoclosure expression: () throws -> T,
 func SWIFTAssertEqual<T: Equatable>(@autoclosure f: () -> T?, @autoclosure _ g: () -> T?, _ message: String = "", file: String = __FILE__, line: UInt = __LINE__) {
     let resultF = f()
     let resultG = g()
-    XCTAssert(resultF == resultG, "\"\(resultF)\" is not equal to \"\(resultG)\"")
+    XCTAssert(resultF == resultG, "\"\(resultF)\" is not equal to \"\(resultG)\" - \(message)")
 }
