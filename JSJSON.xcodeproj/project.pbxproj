@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B8058D2B1B75157E0032DBD4 /* ParsingSpeedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8058D2A1B75157E0032DBD4 /* ParsingSpeedTests.swift */; };
+		B8058D2D1B75157E0032DBD4 /* JSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B825FA101A4985C000FC4C0E /* JSON.framework */; };
+		B8058D331B75165F0032DBD4 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8DCE0221B56CB30004912D6 /* Utilities.swift */; };
+		B8058D341B7516690032DBD4 /* SwiftAssert.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E21DC91B4D5D210072D407 /* SwiftAssert.swift */; };
+		B8058D351B7516CE0032DBD4 /* 1meg.json in Resources */ = {isa = PBXBuildFile; fileRef = B8DCE01C1B56C914004912D6 /* 1meg.json */; };
+		B8058D361B7516CE0032DBD4 /* crazy.json in Resources */ = {isa = PBXBuildFile; fileRef = B8C98E301A53642D0061DC33 /* crazy.json */; };
+		B8058D371B7516CE0032DBD4 /* movies.json in Resources */ = {isa = PBXBuildFile; fileRef = B826CD821A50BCEC00E9F7CE /* movies.json */; };
 		B825FA161A4985C000FC4C0E /* JSJSON.h in Headers */ = {isa = PBXBuildFile; fileRef = B825FA151A4985C000FC4C0E /* JSJSON.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B825FA1C1A4985C000FC4C0E /* JSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B825FA101A4985C000FC4C0E /* JSON.framework */; };
 		B826CD831A50BCEC00E9F7CE /* movies.json in Resources */ = {isa = PBXBuildFile; fileRef = B826CD821A50BCEC00E9F7CE /* movies.json */; };
@@ -20,6 +27,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		B8058D2E1B75157E0032DBD4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B825FA071A4985C000FC4C0E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B825FA0F1A4985C000FC4C0E;
+			remoteInfo = JSON;
+		};
 		B825FA1D1A4985C000FC4C0E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = B825FA071A4985C000FC4C0E /* Project object */;
@@ -30,6 +44,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		B8058D281B75157E0032DBD4 /* JSONSpeedTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JSONSpeedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B8058D2A1B75157E0032DBD4 /* ParsingSpeedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParsingSpeedTests.swift; sourceTree = "<group>"; };
+		B8058D2C1B75157E0032DBD4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B809126A1B4C1147007ADEFF /* SerializationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SerializationTests.swift; sourceTree = "<group>"; };
 		B825FA101A4985C000FC4C0E /* JSON.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JSON.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B825FA141A4985C000FC4C0E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -46,6 +63,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		B8058D251B75157E0032DBD4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B8058D2D1B75157E0032DBD4 /* JSON.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B825FA0C1A4985C000FC4C0E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -64,6 +89,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B8058D291B75157E0032DBD4 /* Speed Tests */ = {
+			isa = PBXGroup;
+			children = (
+				B8058D2A1B75157E0032DBD4 /* ParsingSpeedTests.swift */,
+				B8058D2C1B75157E0032DBD4 /* Info.plist */,
+			);
+			name = "Speed Tests";
+			path = ../JSONSpeedTests;
+			sourceTree = "<group>";
+		};
 		B825FA061A4985C000FC4C0E = {
 			isa = PBXGroup;
 			children = (
@@ -78,6 +113,7 @@
 			children = (
 				B825FA101A4985C000FC4C0E /* JSON.framework */,
 				B825FA1B1A4985C000FC4C0E /* JSONTests.xctest */,
+				B8058D281B75157E0032DBD4 /* JSONSpeedTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -106,19 +142,20 @@
 				B8A0E2661B52816700F006EB /* Resources */,
 				B8E21DC91B4D5D210072D407 /* SwiftAssert.swift */,
 				B8DCE0221B56CB30004912D6 /* Utilities.swift */,
-				B809126A1B4C1147007ADEFF /* SerializationTests.swift */,
-				B826CD861A5156B700E9F7CE /* ParsingTests.swift */,
-				B825FA201A4985C000FC4C0E /* Supporting Files */,
+				B8058D291B75157E0032DBD4 /* Speed Tests */,
+				B825FA201A4985C000FC4C0E /* Logic Tests */,
 			);
 			path = JSJSONTests;
 			sourceTree = "<group>";
 		};
-		B825FA201A4985C000FC4C0E /* Supporting Files */ = {
+		B825FA201A4985C000FC4C0E /* Logic Tests */ = {
 			isa = PBXGroup;
 			children = (
+				B809126A1B4C1147007ADEFF /* SerializationTests.swift */,
+				B826CD861A5156B700E9F7CE /* ParsingTests.swift */,
 				B825FA211A4985C000FC4C0E /* Info.plist */,
 			);
-			name = "Supporting Files";
+			name = "Logic Tests";
 			sourceTree = "<group>";
 		};
 		B8A0E2661B52816700F006EB /* Resources */ = {
@@ -145,6 +182,24 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		B8058D271B75157E0032DBD4 /* JSONSpeedTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B8058D321B75157E0032DBD4 /* Build configuration list for PBXNativeTarget "JSONSpeedTests" */;
+			buildPhases = (
+				B8058D241B75157E0032DBD4 /* Sources */,
+				B8058D251B75157E0032DBD4 /* Frameworks */,
+				B8058D261B75157E0032DBD4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B8058D2F1B75157E0032DBD4 /* PBXTargetDependency */,
+			);
+			name = JSONSpeedTests;
+			productName = JSONSpeedTests;
+			productReference = B8058D281B75157E0032DBD4 /* JSONSpeedTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		B825FA0F1A4985C000FC4C0E /* JSON */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = B825FA261A4985C000FC4C0E /* Build configuration list for PBXNativeTarget "JSON" */;
@@ -191,6 +246,9 @@
 				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = "Jernej Strasner";
 				TargetAttributes = {
+					B8058D271B75157E0032DBD4 = {
+						CreatedOnToolsVersion = 7.0;
+					};
 					B825FA0F1A4985C000FC4C0E = {
 						CreatedOnToolsVersion = 6.1.1;
 						DevelopmentTeam = 286DN3SPR7;
@@ -215,11 +273,22 @@
 			targets = (
 				B825FA0F1A4985C000FC4C0E /* JSON */,
 				B825FA1A1A4985C000FC4C0E /* JSONTests */,
+				B8058D271B75157E0032DBD4 /* JSONSpeedTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		B8058D261B75157E0032DBD4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B8058D371B7516CE0032DBD4 /* movies.json in Resources */,
+				B8058D351B7516CE0032DBD4 /* 1meg.json in Resources */,
+				B8058D361B7516CE0032DBD4 /* crazy.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B825FA0E1A4985C000FC4C0E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -240,6 +309,16 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		B8058D241B75157E0032DBD4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B8058D331B75165F0032DBD4 /* Utilities.swift in Sources */,
+				B8058D341B7516690032DBD4 /* SwiftAssert.swift in Sources */,
+				B8058D2B1B75157E0032DBD4 /* ParsingSpeedTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B825FA0B1A4985C000FC4C0E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -262,6 +341,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		B8058D2F1B75157E0032DBD4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B825FA0F1A4985C000FC4C0E /* JSON */;
+			targetProxy = B8058D2E1B75157E0032DBD4 /* PBXContainerItemProxy */;
+		};
 		B825FA1E1A4985C000FC4C0E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = B825FA0F1A4985C000FC4C0E /* JSON */;
@@ -270,6 +354,34 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		B8058D301B75157E0032DBD4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = JSONSpeedTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jernejstrasner.JSONSpeedTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		B8058D311B75157E0032DBD4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = JSONSpeedTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jernejstrasner.JSONSpeedTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		B825FA241A4985C000FC4C0E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -425,6 +537,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		B8058D321B75157E0032DBD4 /* Build configuration list for PBXNativeTarget "JSONSpeedTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B8058D301B75157E0032DBD4 /* Debug */,
+				B8058D311B75157E0032DBD4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		B825FA0A1A4985C000FC4C0E /* Build configuration list for PBXProject "JSJSON" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
