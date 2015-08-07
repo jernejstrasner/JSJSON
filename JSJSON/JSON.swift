@@ -8,61 +8,16 @@
 
 import Foundation
 
+// MARK: Serialization
+
 public enum SerializationError: ErrorType {
     case TypeNotSupported(Any.Type)
 }
 
 /**
-    Use this protocol to make any custom struct type serializable to JSON.
-    You don't have to implement any custom methods or properties, conformance is enough.
+    Main JSON serialization function.
 */
-public protocol JSONEncodable {}
-
-extension JSONEncodable {
-
-    public func toJSON() throws -> String {
-        return try _reflect(self).toJSON()
-    }
-
-}
-
-protocol JSON_String {}
-extension String : JSON_String {}
-
-extension Array where Element: JSONEncodable {
-
-    public func toJSON() throws -> String {
-        return try _reflect(self).toJSON()
-    }
-
-}
-
-extension Dictionary where Key: JSON_String, Value: JSONEncodable {
-
-    public func toJSON() throws -> String {
-        return try _reflect(self).toJSON()
-    }
-
-}
-
-extension String: JSONEncodable {}
-extension Int: JSONEncodable {}
-extension Int8: JSONEncodable {}
-extension Int16: JSONEncodable {}
-extension Int32: JSONEncodable {}
-extension Int64: JSONEncodable {}
-extension UInt: JSONEncodable {}
-extension UInt8: JSONEncodable {}
-extension UInt16: JSONEncodable {}
-extension UInt32: JSONEncodable {}
-extension UInt64: JSONEncodable {}
-extension Float: JSONEncodable {}
-extension Double: JSONEncodable {}
-
-/**
-    Internal method whose sole purpose is testing.
-*/
-internal func toJSON<T>(x: T) throws -> String {
+public func serialize<T>(x: T) throws -> String {
     return try _reflect(x).toJSON()
 }
 
@@ -113,6 +68,7 @@ private extension _MirrorType {
     
 }
 
+// MARK: Parsing
 
 public enum ParsingError : ErrorType {
     case StringInvalidHexCharacter
@@ -418,7 +374,7 @@ private func parsePrimitive(json: UnsafePointer<Int8>, length: Int, inout positi
     throw ParsingError.InvalidPrimitive
 }
 
-// MARK: Debugging extensions
+// MARK: Debugging
 
 extension Value : CustomDebugStringConvertible {
 
