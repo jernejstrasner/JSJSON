@@ -42,7 +42,7 @@ private extension _MirrorType {
             }
             return try self[0].1.toJSON()
         case .IndexContainer:
-            return "[" + ",".join(try self.mapChildren{ try $1.toJSON() }) + "]"
+            return "[" + (try self.mapChildren{ try $1.toJSON() }.joinWithSeparator(",")) + "]"
         case .KeyContainer:
             let array = try self.mapChildren { name, el -> String in
                 guard let key = el[0].1.value as? String where el.disposition == .Tuple && el.count == 2 else {
@@ -50,10 +50,10 @@ private extension _MirrorType {
                 }
                 return try "\""+key+"\":"+el[1].1.toJSON()
             }
-            return "{" + ",".join(array) + "}"
+            return "{" + array.joinWithSeparator(",") + "}"
         case .Struct:
             let mappedChildren = try self.mapChildren { try "\""+$0+"\":"+$1.toJSON() }
-            return "{" + ",".join(mappedChildren) + "}"
+            return "{" + mappedChildren.joinWithSeparator(",") + "}"
         default:
             switch self.value {
             case is Int, is Int8, is Int16, is Int32, is Int64, is UInt, is UInt8, is UInt16, is UInt32, is UInt64, is Float, is Double:

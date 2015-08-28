@@ -26,7 +26,7 @@ struct Person {
         }()
 
     func whatever() {
-        print()
+        print("")
     }
 
     var children: [Person]?
