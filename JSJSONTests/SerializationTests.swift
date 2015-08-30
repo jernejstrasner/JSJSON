@@ -35,30 +35,30 @@ struct Person {
 class SerializationTests: XCTestCase {
 
     func testErrors() {
-        SWIFTAssertThrows(try JSON.serialize(NSData()))
-        SWIFTAssertNoThrow(try JSON.serialize(999))
+        AssertThrows(try JSON.serialize(NSData()))
+        AssertNoThrow(try JSON.serialize(999))
     }
 
     func testNumbers() {
-        SWIFTAssertNoThrowValidateValue(try JSON.serialize(1)) { $0 == "1" }
-        SWIFTAssertNoThrowValidateValue(try JSON.serialize(1)) { $0 == "1" }
-        SWIFTAssertNoThrowValidateValue(try JSON.serialize(0)) { $0 == "0" }
-        SWIFTAssertNoThrowValidateValue(try JSON.serialize(8.3)) { $0 == "8.3" }
-        SWIFTAssertNoThrowValidateValue(try JSON.serialize(-772.1214842)) { $0 == "-772.1214842" }
-        SWIFTAssertNoThrowValidateValue(try JSON.serialize(Int8(3))) { $0 == "3" }
+        AssertNoThrowValidateValue(try JSON.serialize(1)) { $0 == "1" }
+        AssertNoThrowValidateValue(try JSON.serialize(1)) { $0 == "1" }
+        AssertNoThrowValidateValue(try JSON.serialize(0)) { $0 == "0" }
+        AssertNoThrowValidateValue(try JSON.serialize(8.3)) { $0 == "8.3" }
+        AssertNoThrowValidateValue(try JSON.serialize(-772.1214842)) { $0 == "-772.1214842" }
+        AssertNoThrowValidateValue(try JSON.serialize(Int8(3))) { $0 == "3" }
     }
 
     func testString() {
-        SWIFTAssertNoThrowValidateValue(try JSON.serialize("test")) { $0 == "\"test\"" }
-        SWIFTAssertNoThrowValidateValue(try JSON.serialize("emoji😄")) { $0 == "\"emoji😄\"" }
+        AssertNoThrowValidateValue(try JSON.serialize("test")) { $0 == "\"test\"" }
+        AssertNoThrowValidateValue(try JSON.serialize("emoji😄")) { $0 == "\"emoji😄\"" }
     }
     
     func testArray() {
         let a = [0, 8, 2, 1, 9, 0]
-        SWIFTAssertNoThrowValidateValue(try JSON.serialize(a)) { $0 == "[0,8,2,1,9,0]" }
+        AssertNoThrowValidateValue(try JSON.serialize(a)) { $0 == "[0,8,2,1,9,0]" }
 
         let b = [871.22, 9381.1123, -84812.1212, 2.398287733]
-        SWIFTAssertNoThrowValidateValue(try JSON.serialize(b)) { $0 == "[871.22,9381.1123,-84812.1212,2.398287733]" }
+        AssertNoThrowValidateValue(try JSON.serialize(b)) { $0 == "[871.22,9381.1123,-84812.1212,2.398287733]" }
     }
 
     func testDictionary() {
@@ -75,19 +75,19 @@ class SerializationTests: XCTestCase {
             "{\"c\":813,\"b\":922,\"a\":9}",
             "{\"c\":813,\"a\":9,\"b\":922}",
         ]
-        SWIFTAssertNoThrowValidateValue(try JSON.serialize(a)) { set.contains($0) }
+        AssertNoThrowValidateValue(try JSON.serialize(a)) { set.contains($0) }
     }
 
     func testStruct() {
         let a = Person(name: "John", age: 32, children: nil)
-        SWIFTAssertNoThrowValidateValue(try JSON.serialize(a)) { $0 == "{\"name\":\"John\",\"age\":32,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null}" }
+        AssertNoThrowValidateValue(try JSON.serialize(a)) { $0 == "{\"name\":\"John\",\"age\":32,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null}" }
 
         let b = Person(name: "George", age: 43, children: [
             Person(name: "Ann", age: 12, children: nil),
             Person(name: "Matt", age: 18, children: nil)
             ]
         )
-        SWIFTAssertNoThrowValidateValue(try JSON.serialize(b)) { $0 == "{\"name\":\"George\",\"age\":43,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":[{\"name\":\"Ann\",\"age\":12,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null},{\"name\":\"Matt\",\"age\":18,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null}]}" }
+        AssertNoThrowValidateValue(try JSON.serialize(b)) { $0 == "{\"name\":\"George\",\"age\":43,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":[{\"name\":\"Ann\",\"age\":12,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null},{\"name\":\"Matt\",\"age\":18,\"factor\":99.1,\"address\":\"745 Homer Ave, Palo Alto 94301\",\"children\":null}]}" }
     }
 
 //    // Not supporting ObjC objects, here just for testing how much support we get for free
